@@ -1,0 +1,1472 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Casse les Cadenas du Coffre Magique</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Arial', sans-serif;
+      background-image: url('https://m.gettywallpapers.com/fr/wp-content/uploads/2023/09/Galaxie-Fond-decran-dordinateur-4k-HD.jpg');
+      background-size: cover;
+      background-position: center;
+      background-attachment: fixed;
+      color: #fff;
+      text-align: center;
+      min-height: 100vh;
+      padding: 10px;
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      gap: 10px;
+    }
+
+    body::before {
+      content: '';
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(135deg, rgba(26, 26, 46, 0.7) 0%, rgba(22, 33, 62, 0.7) 50%, rgba(15, 52, 96, 0.7) 100%);
+      z-index: -1;
+    }
+
+    .game-container {
+      width: 100%;
+      max-width: 800px;
+      background: rgba(10, 15, 30, 0.9);
+      border-radius: 20px;
+      padding: 20px;
+      backdrop-filter: blur(10px);
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.7);
+      position: relative;
+      border: 2px solid rgba(184, 134, 11, 0.5);
+      margin-bottom: 20px;
+    }
+
+    .game-container::before {
+      content: '';
+      position: absolute;
+      top: -2px;
+      left: -2px;
+      right: -2px;
+      bottom: -2px;
+      background: linear-gradient(45deg, #b8860b, #daa520, #ffd700, #daa520, #b8860b);
+      border-radius: 22px;
+      z-index: -1;
+      animation: borderGlow 3s linear infinite;
+      opacity: 0.7;
+    }
+
+    @keyframes borderGlow {
+      0% { filter: hue-rotate(0deg); }
+      100% { filter: hue-rotate(360deg); }
+    }
+
+    h1 {
+      font-size: 1.8em;
+      margin-bottom: 15px;
+      text-shadow: 0 0 20px rgba(255, 215, 0, 0.5);
+      background: linear-gradient(45deg, #ffd700, #daa520, #b8860b);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .squirrel-logo {
+      width: 50px;
+      height: 50px;
+      margin: 0 auto 15px;
+      background-image: url('https://cdnjs.cloudflare.com/ajax/libs/twemoji/14.0.2/72x72/1f43f.png');
+      background-size: contain;
+      background-repeat: no-repeat;
+      background-position: center;
+      filter: drop-shadow(0 0 10px rgba(255, 255, 255, 0.3));
+      animation: squirrelBounce 2s ease-in-out infinite;
+    }
+
+    @keyframes squirrelBounce {
+      0%, 100% { transform: translateY(0) scale(1); }
+      50% { transform: translateY(-5px) scale(1.05); }
+    }
+
+    .difficulty-levels {
+      display: flex;
+      justify-content: center;
+      gap: 15px;
+      margin: 20px 0;
+      flex-wrap: wrap;
+    }
+
+    .difficulty-level {
+      width: 120px;
+      height: 120px;
+      cursor: pointer;
+      border: 2px solid rgba(255, 255, 255, 0.3);
+      border-radius: 15px;
+      background: rgba(255, 255, 255, 0.1);
+      transition: all 0.3s ease;
+      backdrop-filter: blur(5px);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 10px;
+      position: relative;
+    }
+
+    .difficulty-level:hover {
+      background: rgba(255, 255, 255, 0.2);
+      transform: translateY(-5px) scale(1.08);
+    }
+
+    .difficulty-level.active {
+      border-color: #fff;
+      box-shadow: 0 0 20px rgba(255, 255, 255, 0.7);
+      background: rgba(255, 255, 255, 0.3);
+      transform: scale(1.05);
+    }
+
+    .difficulty-level img {
+      width: 65px;
+      height: 65px;
+      object-fit: contain;
+      filter: drop-shadow(0 0 5px rgba(255, 255, 255, 0.5));
+    }
+
+    .difficulty-label {
+      font-size: 13px;
+      margin-top: 5px;
+      font-weight: bold;
+      color: #feca57;
+      text-shadow: 0 0 3px rgba(0, 0, 0, 0.8);
+    }
+
+    .difficulty-reward {
+      font-size: 11px;
+      color: #ffd700;
+      margin-top: 3px;
+    }
+
+    .chest-container {
+      position: relative;
+      margin: 20px auto;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      width: 100%;
+      min-height: 500px;
+      perspective: 1000px;
+      gap: 15px;
+      flex-wrap: wrap;
+    }
+
+    .magic-chest {
+      width: 500px;
+      height: 300px;
+      margin: 0 auto;
+      background-image: url('https://i.ibb.co/ZzzWFhC4/coffre.png');
+      background-size: contain;
+      background-repeat: no-repeat;
+      background-position: center;
+      position: relative;
+      transition: all 0.3s ease;
+      filter: drop-shadow(0 0 20px rgba(255, 215, 0, 0.8)) brightness(1.2) contrast(1.1);
+      z-index: 5;
+    }
+
+    .locks-container {
+      position: absolute;
+      top: -60px;
+      left: 0;
+      width: 100%;
+      display: flex;
+      justify-content: space-around;
+      z-index: 10;
+    }
+
+    .lock {
+      width: 100px;
+      height: 100px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      position: relative;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      animation: floatLock 3s ease-in-out infinite;
+      background: transparent;
+      border: none;
+    }
+
+    .lock-image {
+      width: 90px;
+      height: 90px;
+      background-image: url('https://i.ibb.co/20XRf3Q3/cadena.png');
+      background-size: contain;
+      background-repeat: no-repeat;
+      background-position: center;
+      filter: drop-shadow(0 0 5px rgba(255, 215, 0, 0.5));
+    }
+
+    @keyframes floatLock {
+      0%, 100% { transform: translateY(0) scale(1); }
+      50% { transform: translateY(-8px) scale(1.05); }
+    }
+
+    .lock:hover {
+      transform: scale(1.1);
+    }
+
+    .lock:hover .lock-image {
+      filter: drop-shadow(0 0 15px rgba(255, 215, 0, 0.7));
+    }
+
+    .lock.broken {
+      opacity: 0.3;
+      filter: grayscale(100%);
+      pointer-events: none;
+      animation: none;
+    }
+
+    .hp-bar {
+      position: absolute;
+      bottom: -25px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 70px;
+      height: 8px;
+      background: rgba(0, 0, 0, 0.5);
+      border-radius: 4px;
+      overflow: hidden;
+      border: 1px solid rgba(255, 255, 255, 0.3);
+    }
+
+    .hp-fill {
+      height: 100%;
+      background: linear-gradient(90deg, #4CAF50, #8BC34A);
+      transition: width 0.5s ease;
+      border-radius: 4px;
+    }
+
+    .coins-earned {
+      position: absolute;
+      top: -30px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: linear-gradient(45deg, #ffd700, #ffed4a);
+      color: #000;
+      padding: 8px 15px;
+      border-radius: 20px;
+      font-weight: bold;
+      font-size: 16px;
+      animation: coinEarn 2s ease forwards;
+      pointer-events: none;
+      z-index: 1000;
+      box-shadow: 0 0 15px rgba(255, 215, 0, 0.8);
+      border: 2px solid #ffd700;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    @keyframes coinEarn {
+      0% {
+        opacity: 0;
+        transform: translateX(-50%) translateY(20px) scale(0.5);
+      }
+      20% {
+        opacity: 1;
+        transform: translateX(-50%) translateY(-10px) scale(1.2);
+      }
+      40% {
+        opacity: 1;
+        transform: translateX(-50%) translateY(-15px) scale(1.2);
+      }
+      60% {
+        opacity: 1;
+        transform: translateX(-50%) translateY(-20px) scale(1.1);
+      }
+      100% {
+        opacity: 0;
+        transform: translateX(-50%) translateY(-50px) scale(1);
+      }
+    }
+
+    .reward-popup {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%) scale(0);
+      background: linear-gradient(135deg, #ffd700, #ffed4a);
+      color: #000;
+      padding: 20px 30px;
+      border-radius: 20px;
+      font-weight: bold;
+      font-size: 24px;
+      z-index: 2000;
+      box-shadow: 0 0 30px rgba(255, 215, 0, 0.8);
+      border: 3px solid #daa520;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      animation: rewardPopup 1.5s ease-in-out forwards;
+    }
+
+    @keyframes rewardPopup {
+      0% {
+        transform: translate(-50%, -50%) scale(0);
+        opacity: 0;
+      }
+      20% {
+        transform: translate(-50%, -50%) scale(1.3);
+        opacity: 1;
+      }
+      40% {
+        transform: translate(-50%, -50%) scale(1.1);
+        opacity: 1;
+      }
+      60% {
+        transform: translate(-50%, -50%) scale(1.2);
+        opacity: 1;
+      }
+      80% {
+        transform: translate(-50%, -50%) scale(1.1);
+        opacity: 1;
+      }
+      100% {
+        transform: translate(-50%, -50%) scale(1);
+        opacity: 0;
+      }
+    }
+
+    .attack-modes {
+      display: flex;
+      justify-content: center;
+      gap: 12px;
+      margin: 15px 0;
+      flex-wrap: wrap;
+    }
+
+    .attack-mode-image {
+      width: 110px;
+      height: 110px;
+      cursor: pointer;
+      border: 2px solid rgba(255, 255, 255, 0.3);
+      border-radius: 15px;
+      background: rgba(255, 255, 255, 0.1);
+      transition: all 0.3s ease;
+      backdrop-filter: blur(5px);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 10px;
+      position: relative;
+    }
+
+    .attack-mode-image:hover {
+      background: rgba(255, 255, 255, 0.2);
+      transform: translateY(-5px) scale(1.08);
+    }
+
+    .attack-mode-image.active {
+      border-color: #fff;
+      box-shadow: 0 0 20px rgba(255, 255, 255, 0.7);
+      background: rgba(255, 255, 255, 0.3);
+      transform: scale(1.05);
+    }
+
+    .attack-mode-image img {
+      width: 65px;
+      height: 65px;
+      object-fit: contain;
+      filter: drop-shadow(0 0 5px rgba(255, 255, 255, 0.5));
+    }
+
+    .attack-mode-label {
+      font-size: 13px;
+      margin-top: 5px;
+      font-weight: bold;
+      color: #feca57;
+      text-shadow: 0 0 3px rgba(0, 0, 0, 0.8);
+    }
+
+    .hammer {
+      position: absolute;
+      width: 60px;
+      height: 60px;
+      font-size: 2.5em;
+      z-index: 10;
+      top: -30px;
+      right: -15px;
+      transform-origin: bottom center;
+      transition: transform 0.3s ease;
+      pointer-events: none;
+    }
+
+    .hammer.hitting {
+      animation: hammerHit 0.4s ease-out;
+    }
+
+    @keyframes hammerHit {
+      0% { transform: rotate(0deg) translateY(0); }
+      50% { transform: rotate(-45deg) translateY(15px); }
+      100% { transform: rotate(0deg) translateY(0); }
+    }
+
+    .impact-effect {
+      position: absolute;
+      font-size: 2em;
+      pointer-events: none;
+      z-index: 3;
+      animation: impactPop 1s ease-out forwards;
+      opacity: 0;
+      filter: drop-shadow(0 0 10px rgba(255,255,255,0.8));
+    }
+
+    @keyframes impactPop {
+      0% { opacity: 0; transform: scale(0.3) translateY(0); }
+      30% { opacity: 1; transform: scale(1.5) translateY(-15px); }
+      100% { opacity: 0; transform: scale(1) translateY(-50px); }
+    }
+
+    .controls {
+      margin: 15px 0;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    button {
+      padding: 12px 25px;
+      font-size: 16px;
+      cursor: pointer;
+      border: none;
+      border-radius: 25px;
+      background: linear-gradient(45deg, #b8860b, #daa520);
+      color: #fff;
+      transition: all 0.3s ease;
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+      text-transform: uppercase;
+      font-weight: bold;
+      letter-spacing: 1px;
+    }
+
+    button:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4);
+      background: linear-gradient(45deg, #daa520, #ffd700);
+    }
+
+    button:active {
+      transform: translateY(0);
+    }
+
+    #resetBtn {
+      background: linear-gradient(45deg, #555, #777);
+    }
+
+    #resetBtn:hover {
+      background: linear-gradient(45deg, #777, #999);
+    }
+
+    #message {
+      margin: 15px 0;
+      font-size: 1em;
+      font-weight: bold;
+      text-shadow: 0 0 10px rgba(255, 255, 255, 0.8);
+      min-height: 25px;
+      color: #daa520;
+    }
+
+    .stats {
+      display: flex;
+      justify-content: space-around;
+      margin: 20px 0;
+      background: rgba(255, 255, 255, 0.1);
+      padding: 15px;
+      border-radius: 15px;
+    }
+
+    .stat {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .stat-value {
+      font-size: 1.8em;
+      font-weight: bold;
+      color: #ffd700;
+    }
+
+    .stat-label {
+      font-size: 0.9em;
+      color: #daa520;
+    }
+
+    .popup-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.7);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 1000;
+      opacity: 0;
+      visibility: hidden;
+      transition: all 0.3s ease;
+    }
+
+    .popup-overlay.active {
+      opacity: 1;
+      visibility: visible;
+    }
+
+    .popup-content {
+      background: linear-gradient(135deg, rgba(184, 134, 11, 0.95), rgba(218, 165, 32, 0.95));
+      padding: 25px;
+      border-radius: 20px;
+      max-width: 450px;
+      width: 90%;
+      text-align: center;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+      border: 3px solid rgba(255, 255, 255, 0.5);
+      backdrop-filter: blur(10px);
+      transform: scale(0.7);
+      transition: transform 0.4s ease;
+      position: relative;
+    }
+
+    .popup-overlay.active .popup-content {
+      transform: scale(1);
+    }
+
+    .popup-content h3 {
+      font-size: 1.8em;
+      margin-bottom: 15px;
+      color: #fff;
+      text-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+    }
+
+    .popup-reward-image {
+      width: 140px;
+      height: 140px;
+      margin: 15px auto;
+      background-size: contain;
+      background-repeat: no-repeat;
+      background-position: center;
+      border-radius: 10px;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.4);
+    }
+
+    .popup-reward-text {
+      font-size: 1.3em;
+      margin: 15px 0;
+      color: #fff;
+      font-weight: bold;
+      text-shadow: 0 0 5px rgba(0, 0, 0, 0.5);
+    }
+
+    .popup-victory-message {
+      font-size: 1.4em;
+      margin: 15px 0;
+      color: #feca57;
+      text-shadow: 0 0 10px rgba(255, 215, 0, 0.7);
+      font-weight: bold;
+    }
+
+    .popup-close-btn {
+      padding: 10px 25px;
+      font-size: 16px;
+      cursor: pointer;
+      border: none;
+      border-radius: 20px;
+      background: linear-gradient(45deg, #b8860b, #daa520);
+      color: #fff;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+      font-weight: bold;
+      margin-top: 15px;
+    }
+
+    .popup-close-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 15px rgba(0, 0, 0, 0.4);
+      background: linear-gradient(45deg, #daa520, #ffd700);
+    }
+
+    .sound-menu {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      z-index: 100;
+    }
+
+    .sound-toggle {
+      background: rgba(10, 15, 30, 0.8);
+      border: 2px solid rgba(184, 134, 11, 0.5);
+      border-radius: 50%;
+      width: 50px;
+      height: 50px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      font-size: 24px;
+      color: #daa520;
+      transition: all 0.3s ease;
+    }
+
+    .sound-toggle:hover {
+      background: rgba(184, 134, 11, 0.2);
+      transform: scale(1.1);
+    }
+
+    .sound-controls {
+      position: absolute;
+      top: 70px;
+      right: 0;
+      background: rgba(10, 15, 30, 0.9);
+      border-radius: 15px;
+      padding: 15px;
+      width: 200px;
+      box-shadow: 0 5px 20px rgba(0, 0, 0, 0.5);
+      border: 2px solid rgba(184, 134, 11, 0.5);
+      opacity: 0;
+      visibility: hidden;
+      transform: translateY(-10px);
+      transition: all 0.3s ease;
+    }
+
+    .sound-controls.active {
+      opacity: 1;
+      visibility: visible;
+      transform: translateY(0);
+    }
+
+    .sound-control {
+      margin-bottom: 15px;
+      text-align: left;
+    }
+
+    .sound-control:last-child {
+      margin-bottom: 0;
+    }
+
+    .sound-control label {
+      display: block;
+      margin-bottom: 5px;
+      font-size: 14px;
+      color: #daa520;
+    }
+
+    .sound-control input[type="range"] {
+      width: 100%;
+      height: 8px;
+      border-radius: 4px;
+      background: rgba(255, 255, 255, 0.1);
+      outline: none;
+      -webkit-appearance: none;
+    }
+
+    .sound-control input[type="range"]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      background: #daa520;
+      cursor: pointer;
+    }
+
+    #saveBtn {
+      background: linear-gradient(45deg, #2e7d32, #4caf50);
+    }
+
+    #saveBtn:hover {
+      background: linear-gradient(45deg, #4caf50, #66bb6a);
+    }
+
+    .save-indicator {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      background: rgba(46, 125, 50, 0.9);
+      color: white;
+      padding: 10px 15px;
+      border-radius: 20px;
+      font-size: 14px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+      opacity: 0;
+      transform: translateY(10px);
+      transition: all 0.3s ease;
+      z-index: 100;
+    }
+
+    .save-indicator.active {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    @media (min-width: 768px) {
+      .game-container {
+        padding: 30px;
+        max-width: 900px;
+      }
+      
+      h1 {
+        font-size: 2.2em;
+      }
+      
+      .magic-chest {
+        width: 600px;
+        height: 350px;
+      }
+      
+      .hammer {
+        width: 80px;
+        height: 80px;
+        font-size: 3em;
+        top: -40px;
+        right: -20px;
+      }
+      
+      .controls {
+        flex-direction: row;
+        justify-content: center;
+      }
+      
+      button {
+        padding: 15px 30px;
+      }
+
+      .attack-mode-image {
+        width: 100px;
+        height: 100px;
+      }
+
+      .attack-mode-image img {
+        width: 55px;
+        height: 55px;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .attack-modes {
+        gap: 5px;
+        padding: 0 5px;
+      }
+
+      .attack-mode-image {
+        width: 85px;
+        height: 85px;
+      }
+
+      .attack-mode-image img {
+        width: 50px;
+        height: 50px;
+      }
+
+      .attack-mode-label {
+        font-size: 11px;
+      }
+
+      .magic-chest {
+        width: 350px;
+        height: 200px;
+      }
+      
+      .lock {
+        width: 80px;
+        height: 80px;
+      }
+      
+      .lock-image {
+        width: 70px;
+        height: 70px;
+      }
+      
+      .locks-container {
+        top: -50px;
+      }
+      
+      .sound-menu {
+        top: 10px;
+        right: 10px;
+      }
+      
+      .sound-toggle {
+        width: 40px;
+        height: 40px;
+        font-size: 20px;
+      }
+      
+      .sound-controls {
+        width: 180px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="game-container" id="gameContainer">
+    <h1>🔓 Casse les Cadenas du Coffre Magique 🔓</h1>
+    <div class="squirrel-logo"></div>
+    
+    <div class="sound-menu">
+      <div class="sound-toggle" id="soundToggle">🔊</div>
+      <div class="sound-controls" id="soundControls">
+        <div class="sound-control">
+          <label for="masterVolume">Volume général</label>
+          <input type="range" id="masterVolume" min="0" max="100" value="50">
+        </div>
+        <div class="sound-control">
+          <label for="effectsVolume">Effets sonores</label>
+          <input type="range" id="effectsVolume" min="0" max="100" value="70">
+        </div>
+        <div class="sound-control">
+          <label for="musicVolume">Musique</label>
+          <input type="range" id="musicVolume" min="0" max="100" value="30">
+        </div>
+      </div>
+    </div>
+    
+    <div class="difficulty-levels">
+      <div id="difficultyEasy" class="difficulty-level active">
+        <img src="https://i.ibb.co/2fBDM0x/IMG-6230-Photoroom.png" alt="Facile">
+        <div class="difficulty-label">Facile</div>
+        <div class="difficulty-reward">1000 pièces</div>
+      </div>
+      <div id="difficultyMedium" class="difficulty-level">
+        <img src="https://i.ibb.co/xKjwCQ4X/IMG-7355-Photoroom.png" alt="Moyen">
+        <div class="difficulty-label">Moyen</div>
+        <div class="difficulty-reward">3000 pièces</div>
+      </div>
+      <div id="difficultyHard" class="difficulty-level">
+        <img src="https://i.ibb.co/gbvXGqHj/IMG-7356-Photoroom.png" alt="Difficile">
+        <div class="difficulty-label">Difficile</div>
+        <div class="difficulty-reward">5000 pièces</div>
+      </div>
+    </div>
+    
+    <div class="stats">
+      <div class="stat">
+        <div class="stat-value" id="coinsCount">0</div>
+        <div class="stat-label">Pièces</div>
+      </div>
+      <div class="stat">
+        <div class="stat-value" id="locksBroken">0/4</div>
+        <div class="stat-label">Cadenas Cassés</div>
+      </div>
+    </div>
+    
+    <div class="chest-container">
+      <div class="locks-container">
+        <div class="lock" id="lock1">
+          <div class="lock-image"></div>
+          <div class="hp-bar">
+            <div class="hp-fill" id="lock1HP" style="width: 100%;"></div>
+          </div>
+        </div>
+        <div class="lock" id="lock2">
+          <div class="lock-image"></div>
+          <div class="hp-bar">
+            <div class="hp-fill" id="lock2HP" style="width: 100%;"></div>
+          </div>
+        </div>
+        <div class="lock" id="lock3">
+          <div class="lock-image"></div>
+          <div class="hp-bar">
+            <div class="hp-fill" id="lock3HP" style="width: 100%;"></div>
+          </div>
+        </div>
+        <div class="lock" id="lock4">
+          <div class="lock-image"></div>
+          <div class="hp-bar">
+            <div class="hp-fill" id="lock4HP" style="width: 100%;"></div>
+          </div>
+        </div>
+      </div>
+      
+      <div class="magic-chest" id="magicChest"></div>
+      <div class="hammer" id="hammer">🔨</div>
+    </div>
+
+    <div class="attack-modes">
+      <div id="mode1" class="attack-mode-image active">
+        <img src="https://i.ibb.co/WNXDxn2y/IMG-7354-Photoroom.png" alt="Rose - 1 coup">
+        <div class="attack-mode-label">1 coup</div>
+      </div>
+      <div id="mode10" class="attack-mode-image">
+        <img src="https://i.ibb.co/7JsBRrCn/IMG-5885.png" alt="Rosa - 10 coups">
+        <div class="attack-mode-label">10 coups</div>
+      </div>
+      <div id="mode30" class="attack-mode-image">
+        <img src="https://i.ibb.co/8DMJ0cxy/IMG-7355-Photoroom.png" alt="Donuts - 30 coups">
+        <div class="attack-mode-label">30 coups</div>
+      </div>
+      <div id="mode100" class="attack-mode-image">
+        <img src="https://i.ibb.co/C5M6DHcS/IMG-7356-Photoroom.png" alt="Coeurs - 100 coups">
+        <div class="attack-mode-label">100 coups</div>
+      </div>
+      <div id="mode500" class="attack-mode-image">
+        <img src="https://i.ibb.co/Kc4JWYkB/IMG-6231-Photoroom.png" alt="500 coups">
+        <div class="attack-mode-label">500 coups</div>
+      </div>
+      <div id="mode1000" class="attack-mode-image">
+        <img src="https://i.ibb.co/2fBDM0x/IMG-6230-Photoroom.png" alt="1000 coups">
+        <div class="attack-mode-label">1000 coups</div>
+      </div>
+    </div>
+
+    <div class="controls">
+      <button id="attackBtn">🔨 Attaquer</button>
+      <button id="saveBtn">💾 Sauvegarder</button>
+      <button id="resetBtn">Nouveau Coffre</button>
+    </div>
+
+    <p id="message">Choisis un niveau de difficulté et clique sur "Attaquer" !</p>
+  </div>
+
+  <div class="save-indicator" id="saveIndicator">Partie sauvegardée !</div>
+
+  <div class="popup-overlay" id="victoryPopup">
+    <div class="popup-content">
+      <h3>🎉 Félicitations ! 🎉</h3>
+      <div class="popup-reward-image" id="popupRewardImage"></div>
+      <p class="popup-reward-text">Vous avez cassé tous les cadenas !</p>
+      <div class="popup-victory-message" id="popupVictoryMessage">+1000 pièces bonus !</div>
+      <button class="popup-close-btn" id="closePopupBtn">Continuer</button>
+    </div>
+  </div>
+
+  <!-- Sons intégrés -->
+  <audio id="hammerSound" preload="auto">
+    <source src="https://assets.mixkit.co/sfx/preview/mixkit-hammer-hit-751.mp3" type="audio/mpeg">
+  </audio>
+  <audio id="lockBreakSound" preload="auto">
+    <source src="https://assets.mixkit.co/sfx/preview/mixkit-breaking-glass-389.mp3" type="audio/mpeg">
+  </audio>
+  <audio id="coinSound" preload="auto">
+    <source src="https://assets.mixkit.co/sfx/preview/mixkit-coin-win-1936.mp3" type="audio/mpeg">
+  </audio>
+  <audio id="victorySound" preload="auto">
+    <source src="https://assets.mixkit.co/sfx/preview/mixkit-winning-chimes-2015.mp3" type="audio/mpeg">
+  </audio>
+  <audio id="backgroundMusic" loop preload="auto">
+    <source src="https://assets.mixkit.co/music/preview/mixkit-game-show-suspense-waiting-667.mp3" type="audio/mpeg">
+  </audio>
+
+  <script>
+    // Variables du jeu
+    let coins = 0;
+    let attackPower = 1;
+    let locksBroken = 0;
+    const maxLocks = 4;
+    let lockHP = 1300; // Base HP pour le niveau facile
+    let isAttacking = false;
+    let currentDifficulty = 'easy';
+    
+    // Variables pour le son
+    let masterVolume = 0.5;
+    let effectsVolume = 0.7;
+    let musicVolume = 0.3;
+    let soundEnabled = true;
+    
+    // État des cadenas
+    const locks = [
+      { id: 'lock1', hp: lockHP, element: null, hpBar: null },
+      { id: 'lock2', hp: lockHP, element: null, hpBar: null },
+      { id: 'lock3', hp: lockHP, element: null, hpBar: null },
+      { id: 'lock4', hp: lockHP, element: null, hpBar: null }
+    ];
+    
+    // Éléments DOM
+    const coinsCount = document.getElementById('coinsCount');
+    const locksBrokenCount = document.getElementById('locksBroken');
+    const message = document.getElementById('message');
+    const attackBtn = document.getElementById('attackBtn');
+    const resetBtn = document.getElementById('resetBtn');
+    const saveBtn = document.getElementById('saveBtn');
+    const magicChest = document.getElementById('magicChest');
+    const hammer = document.getElementById('hammer');
+    const victoryPopup = document.getElementById('victoryPopup');
+    const closePopupBtn = document.getElementById('closePopupBtn');
+    const saveIndicator = document.getElementById('saveIndicator');
+    const popupRewardImage = document.getElementById('popupRewardImage');
+    const popupVictoryMessage = document.getElementById('popupVictoryMessage');
+    
+    // Éléments audio
+    const hammerSound = document.getElementById('hammerSound');
+    const lockBreakSound = document.getElementById('lockBreakSound');
+    const coinSound = document.getElementById('coinSound');
+    const victorySound = document.getElementById('victorySound');
+    const backgroundMusic = document.getElementById('backgroundMusic');
+    
+    // Éléments de contrôle du son
+    const soundToggle = document.getElementById('soundToggle');
+    const soundControls = document.getElementById('soundControls');
+    const masterVolumeSlider = document.getElementById('masterVolume');
+    const effectsVolumeSlider = document.getElementById('effectsVolume');
+    const musicVolumeSlider = document.getElementById('musicVolume');
+    
+    // Configuration des niveaux de difficulté
+    const difficultySettings = {
+      easy: {
+        name: 'Facile',
+        lockHP: 1300,
+        rewardPerLock: 100,
+        bonusReward: 1000,
+        image: 'https://i.ibb.co/2fBDM0x/IMG-6230-Photoroom.png'
+      },
+      medium: {
+        name: 'Moyen',
+        lockHP: 3900, // 3x plus de vie
+        rewardPerLock: 300,
+        bonusReward: 3000,
+        image: 'https://i.ibb.co/xKjwCQ4X/IMG-7355-Photoroom.png'
+      },
+      hard: {
+        name: 'Difficile',
+        lockHP: 6500, // 5x plus de vie
+        rewardPerLock: 500,
+        bonusReward: 5000,
+        image: 'https://i.ibb.co/gbvXGqHj/IMG-7356-Photoroom.png'
+      }
+    };
+    
+    // Initialisation du jeu
+    function initGame() {
+      coins = 0;
+      attackPower = 1;
+      locksBroken = 0;
+      isAttacking = false;
+      
+      // Réinitialiser les cadenas
+      locks.forEach(lock => {
+        lock.hp = lockHP;
+        lock.element = document.getElementById(lock.id);
+        lock.hpBar = document.getElementById(lock.id + 'HP');
+        
+        lock.element.classList.remove('broken');
+        lock.hpBar.style.width = '100%';
+      });
+      
+      // Réinitialiser les modes d'attaque
+      document.querySelectorAll('.attack-mode-image').forEach(btn => {
+        btn.classList.remove('active');
+      });
+      document.getElementById('mode1').classList.add('active');
+      
+      // Mettre à jour l'affichage
+      updateUI();
+      
+      // Message de départ
+      message.textContent = `Niveau ${difficultySettings[currentDifficulty].name} sélectionné. Clique sur 'Attaquer' !`;
+      
+      // Fermer la popup de victoire
+      victoryPopup.classList.remove('active');
+      
+      // Charger la sauvegarde si elle existe
+      loadGame();
+    }
+    
+    // Changer le niveau de difficulté
+    function setDifficulty(difficulty) {
+      currentDifficulty = difficulty;
+      lockHP = difficultySettings[difficulty].lockHP;
+      
+      // Mettre à jour l'affichage des niveaux
+      document.querySelectorAll('.difficulty-level').forEach(btn => {
+        btn.classList.remove('active');
+      });
+      document.getElementById(`difficulty${difficulty.charAt(0).toUpperCase() + difficulty.slice(1)}`).classList.add('active');
+      
+      // Réinitialiser le jeu avec la nouvelle difficulté
+      initGame();
+    }
+    
+    // Mettre à jour l'interface utilisateur
+    function updateUI() {
+      coinsCount.textContent = coins;
+      locksBrokenCount.textContent = `${locksBroken}/${maxLocks}`;
+    }
+    
+    // Jouer un son
+    function playSound(soundElement, volume = 1) {
+      if (!soundEnabled) return;
+      
+      try {
+        soundElement.volume = volume * masterVolume * effectsVolume;
+        soundElement.currentTime = 0;
+        soundElement.play();
+      } catch (e) {
+        console.log("Erreur de lecture audio:", e);
+      }
+    }
+    
+    // Jouer de la musique
+    function playMusic() {
+      if (!soundEnabled) return;
+      
+      try {
+        backgroundMusic.volume = masterVolume * musicVolume;
+        backgroundMusic.play();
+      } catch (e) {
+        console.log("Erreur de lecture de la musique:", e);
+      }
+    }
+    
+    // Arrêter la musique
+    function stopMusic() {
+      backgroundMusic.pause();
+      backgroundMusic.currentTime = 0;
+    }
+    
+    // Afficher la récompense de pièces
+    function showRewardPopup(amount) {
+      const rewardPopup = document.createElement('div');
+      rewardPopup.className = 'reward-popup';
+      rewardPopup.innerHTML = `+${amount} pièces <span style="font-size: 28px;">💰</span>`;
+      
+      document.body.appendChild(rewardPopup);
+      
+      setTimeout(() => {
+        rewardPopup.remove();
+      }, 1500);
+    }
+    
+    // Attaquer les cadenas
+    function attack() {
+      if (locksBroken >= maxLocks || isAttacking) return;
+      
+      isAttacking = true;
+      let damageDealt = 0;
+      
+      // Animation du marteau seulement pour les petits nombres de coups
+      if (attackPower <= 10) {
+        hammer.classList.add('hitting');
+        playSound(hammerSound);
+      }
+      
+      // Trouver un cadena non cassé au hasard (UNE SEULE FOIS pour tous les coups)
+      const activeLocks = locks.filter(lock => lock.hp > 0);
+      if (activeLocks.length === 0) {
+        isAttacking = false;
+        return;
+      }
+      
+      const targetLock = activeLocks[Math.floor(Math.random() * activeLocks.length)];
+      
+      // Effectuer tous les coups sur le MÊME cadena
+      for (let i = 0; i < attackPower; i++) {
+        // Vérifier si le cadena cible est toujours actif
+        if (targetLock.hp <= 0) break;
+        
+        // Appliquer des dégâts
+        targetLock.hp -= 1;
+        damageDealt += 1;
+        
+        // Mettre à jour la barre de vie (seulement toutes les 10 dégâts pour les gros nombres)
+        if (attackPower <= 10 || i % 10 === 0 || i === attackPower - 1) {
+          const hpPercentage = (targetLock.hp / lockHP) * 100;
+          targetLock.hpBar.style.width = `${hpPercentage}%`;
+        }
+        
+        // Créer un effet d'impact seulement pour les petits nombres de coups
+        if (attackPower <= 10) {
+          createImpactEffect(targetLock.element, "💥");
+        }
+        
+        // Vérifier si le cadena est cassé
+        if (targetLock.hp <= 0) {
+          targetLock.element.classList.add('broken');
+          locksBroken++;
+          
+          // Jouer le son de cassage de cadena
+          playSound(lockBreakSound);
+          
+          // Gagner des pièces pour chaque cadena cassé
+          const rewardAmount = difficultySettings[currentDifficulty].rewardPerLock;
+          coins += rewardAmount;
+          
+          // Jouer le son des pièces
+          playSound(coinSound);
+          
+          // Afficher la récompense de pièces
+          showRewardPopup(rewardAmount);
+          showCoinsEarned(targetLock.element, rewardAmount);
+          
+          message.textContent = `Cadena cassé ! +${rewardAmount} pièces ! (${locksBroken}/${maxLocks})`;
+          
+          // Vérifier si tous les cadenas sont cassés
+          if (locksBroken >= maxLocks) {
+            endGame();
+            break;
+          }
+        }
+      }
+      
+      // Mettre à jour l'interface
+      updateUI();
+      
+      // Message de feedback
+      if (damageDealt > 0 && locksBroken < maxLocks) {
+        message.textContent = `Vous avez infligé ${damageDealt} dégâts sur un cadena !`;
+      }
+      
+      // Arrêter l'animation du marteau
+      setTimeout(() => {
+        hammer.classList.remove('hitting');
+        isAttacking = false;
+      }, 400);
+    }
+    
+    // Créer un effet d'impact visuel
+    function createImpactEffect(target, effect) {
+      const impact = document.createElement('div');
+      impact.className = 'impact-effect';
+      impact.textContent = effect;
+      
+      const rect = target.getBoundingClientRect();
+      impact.style.left = `${rect.left + rect.width/2}px`;
+      impact.style.top = `${rect.top}px`;
+      
+      document.body.appendChild(impact);
+      
+      setTimeout(() => {
+        impact.remove();
+      }, 1000);
+    }
+    
+    // Afficher les pièces gagnées
+    function showCoinsEarned(target, amount) {
+      const coinsDiv = document.createElement('div');
+      coinsDiv.className = 'coins-earned';
+      coinsDiv.innerHTML = `+${amount} <span style="font-size: 18px;">💰</span>`;
+      target.appendChild(coinsDiv);
+      
+      setTimeout(() => {
+        coinsDiv.remove();
+      }, 2000);
+    }
+    
+    // Fin du jeu - tous les cadenas sont cassés
+    function endGame() {
+      // Gagner le bonus de pièces
+      const bonusAmount = difficultySettings[currentDifficulty].bonusReward;
+      coins += bonusAmount;
+      updateUI();
+      
+      // Jouer le son de victoire
+      playSound(victorySound);
+      
+      // Mettre à jour la popup de victoire
+      popupRewardImage.style.backgroundImage = `url('${difficultySettings[currentDifficulty].image}')`;
+      popupVictoryMessage.textContent = `+${bonusAmount} pièces bonus !`;
+      
+      // Afficher le message de victoire
+      message.textContent = `Félicitations ! Vous avez cassé tous les cadenas et gagné ${bonusAmount} pièces bonus !`;
+      
+      // Afficher la popup de victoire
+      setTimeout(() => {
+        victoryPopup.classList.add('active');
+      }, 1000);
+    }
+    
+    // Changer le mode d'attaque
+    function setAttackMode(mode) {
+      attackPower = mode;
+      
+      document.querySelectorAll('.attack-mode-image').forEach(btn => {
+        btn.classList.remove('active');
+      });
+      
+      const btnEl = document.getElementById(`mode${mode}`);
+      if (btnEl) btnEl.classList.add('active');
+    }
+    
+    // Sauvegarder la partie
+    function saveGame() {
+      const gameState = {
+        coins: coins,
+        locksBroken: locksBroken,
+        locks: locks.map(lock => ({ id: lock.id, hp: lock.hp })),
+        attackPower: attackPower,
+        difficulty: currentDifficulty
+      };
+      
+      localStorage.setItem('magicChestGame', JSON.stringify(gameState));
+      
+      // Afficher l'indicateur de sauvegarde
+      saveIndicator.classList.add('active');
+      setTimeout(() => {
+        saveIndicator.classList.remove('active');
+      }, 2000);
+    }
+    
+    // Charger la partie sauvegardée
+    function loadGame() {
+      const savedGame = localStorage.getItem('magicChestGame');
+      if (savedGame) {
+        try {
+          const gameState = JSON.parse(savedGame);
+          
+          coins = gameState.coins || coins;
+          locksBroken = gameState.locksBroken || locksBroken;
+          attackPower = gameState.attackPower || attackPower;
+          currentDifficulty = gameState.difficulty || currentDifficulty;
+          
+          // Mettre à jour la difficulté
+          if (gameState.difficulty) {
+            setDifficulty(gameState.difficulty);
+          }
+          
+          // Restaurer l'état des cadenas
+          if (gameState.locks) {
+            gameState.locks.forEach(savedLock => {
+              const lock = locks.find(l => l.id === savedLock.id);
+              if (lock) {
+                lock.hp = savedLock.hp;
+                
+                // Mettre à jour l'affichage
+                const hpPercentage = (lock.hp / lockHP) * 100;
+                lock.hpBar.style.width = `${hpPercentage}%`;
+                
+                if (lock.hp <= 0) {
+                  lock.element.classList.add('broken');
+                }
+              }
+            });
+          }
+          
+          // Mettre à jour le mode d'attaque
+          document.querySelectorAll('.attack-mode-image').forEach(btn => {
+            btn.classList.remove('active');
+          });
+          document.getElementById(`mode${attackPower}`).classList.add('active');
+          
+          updateUI();
+          
+          message.textContent = "Partie chargée !";
+        } catch (e) {
+          console.error("Erreur lors du chargement de la sauvegarde:", e);
+        }
+      }
+    }
+    
+    // Basculer l'état du son
+    function toggleSound() {
+      soundEnabled = !soundEnabled;
+      
+      if (soundEnabled) {
+        soundToggle.textContent = "🔊";
+        playMusic();
+      } else {
+        soundToggle.textContent = "🔇";
+        stopMusic();
+      }
+    }
+    
+    // Mettre à jour les volumes
+    function updateVolumes() {
+      masterVolume = masterVolumeSlider.value / 100;
+      effectsVolume = effectsVolumeSlider.value / 100;
+      musicVolume = musicVolumeSlider.value / 100;
+      
+      // Mettre à jour le volume de la musique
+      backgroundMusic.volume = masterVolume * musicVolume;
+    }
+    
+    // Événements
+    attackBtn.addEventListener('click', attack);
+    resetBtn.addEventListener('click', initGame);
+    saveBtn.addEventListener('click', saveGame);
+    closePopupBtn.addEventListener('click', () => {
+      victoryPopup.classList.remove('active');
+    });
+
+    // Événements pour les niveaux de difficulté
+    document.getElementById("difficultyEasy").addEventListener("click", () => setDifficulty('easy'));
+    document.getElementById("difficultyMedium").addEventListener("click", () => setDifficulty('medium'));
+    document.getElementById("difficultyHard").addEventListener("click", () => setDifficulty('hard'));
+
+    // Événements pour les modes d'attaque
+    document.getElementById("mode1").addEventListener("click", () => setAttackMode(1));
+    document.getElementById("mode10").addEventListener("click", () => setAttackMode(10));
+    document.getElementById("mode30").addEventListener("click", () => setAttackMode(30));
+    document.getElementById("mode100").addEventListener("click", () => setAttackMode(100));
+    document.getElementById("mode500").addEventListener("click", () => setAttackMode(500));
+    document.getElementById("mode1000").addEventListener("click", () => setAttackMode(1000));
+    
+    // Contrôles du son
+    soundToggle.addEventListener('click', () => {
+      soundControls.classList.toggle('active');
+    });
+    
+    masterVolumeSlider.addEventListener('input', updateVolumes);
+    effectsVolumeSlider.addEventListener('input', updateVolumes);
+    musicVolumeSlider.addEventListener('input', updateVolumes);
+    
+    // Fermer le menu son quand on clique ailleurs
+    document.addEventListener('click', (e) => {
+      if (!soundToggle.contains(e.target) && !soundControls.contains(e.target)) {
+        soundControls.classList.remove('active');
+      }
+    });
+    
+    // Raccourcis clavier
+    document.addEventListener('keydown', (e) => {
+      if (e.key === ' ' || e.key === 'Enter') {
+        e.preventDefault();
+        attack();
+      } else if (e.key === 'r' || e.key === 'R') {
+        initGame();
+      } else if (e.key === 's' || e.key === 'S') {
+        saveGame();
+      } else if (e.key === '1') {
+        setAttackMode(1);
+      } else if (e.key === '2') {
+        setAttackMode(10);
+      } else if (e.key === '3') {
+        setAttackMode(30);
+      } else if (e.key === '4') {
+        setAttackMode(100);
+      } else if (e.key === '5') {
+        setAttackMode(500);
+      } else if (e.key === '6') {
+        setAttackMode(1000);
+      } else if (e.key === 'f' || e.key === 'F') {
+        setDifficulty('easy');
+      } else if (e.key === 'm' || e.key === 'M') {
+        setDifficulty('medium');
+      } else if (e.key === 'h' || e.key === 'H') {
+        setDifficulty('hard');
+      } else if (e.key === 'a' || e.key === 'A') {
+        toggleSound();
+      } else if (e.key === 'Escape') {
+        victoryPopup.classList.remove('active');
+        soundControls.classList.remove('active');
+      }
+    });
+    
+    // Initialiser le jeu au chargement
+    window.addEventListener('load', () => {
+      initGame();
+      playMusic();
+    });
+  </script>
+</body>
+</html>
