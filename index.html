@@ -1437,7 +1437,7 @@
     let jackpotAmount = 1000; // Jackpot de départ à 1000 pièces
     let hitsSinceLastJackpot = 0;
     const jackpotInterval = 500; // Tous les 500 coups
-    const jackpotChance = 1000000; // 1 chance sur 1 million
+    const jackpotChance = 1000000000; // MODIFICATION: 1 chance sur 1 milliard (au lieu de 1 million)
     
     // Historique des gains récents
     let recentRewards = [];
@@ -1840,7 +1840,7 @@
         updateUI();
       }
       
-      // Vérifier si le joueur gagne le jackpot (1 chance sur 1 million par coup)
+      // Vérifier si le joueur gagne le jackpot (1 chance sur 1 milliard par coup)
       if (Math.random() < attackPower / jackpotChance) {
         coins += jackpotAmount;
         
