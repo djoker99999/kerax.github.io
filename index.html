@@ -984,6 +984,83 @@
       }
     }
 
+    /* NOUVEAU : Styles pour le compteur de combo */
+    .combo-counter {
+      position: fixed;
+      top: 20px;
+      left: 20px;
+      background: rgba(255, 50, 50, 0.8);
+      color: white;
+      border-radius: 50%;
+      width: 70px;
+      height: 70px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      font-weight: bold;
+      box-shadow: 0 0 20px rgba(255, 0, 0, 0.7);
+      z-index: 100;
+      opacity: 0;
+      transform: scale(0);
+      transition: all 0.3s ease;
+      border: 3px solid rgba(255, 255, 255, 0.7);
+    }
+
+    .combo-counter.active {
+      opacity: 1;
+      transform: scale(1);
+    }
+
+    .combo-count {
+      font-size: 1.8em;
+      line-height: 1;
+    }
+
+    .combo-label {
+      font-size: 0.7em;
+      margin-top: 2px;
+    }
+
+    .combo-popup {
+      position: absolute;
+      font-size: 22px;
+      font-weight: bold;
+      color: #ff4444;
+      text-shadow: 0 0 10px rgba(255, 0, 0, 0.7);
+      pointer-events: none;
+      z-index: 100;
+      animation: comboFloat 1.5s ease-out forwards;
+      white-space: nowrap;
+    }
+
+    @keyframes comboFloat {
+      0% {
+        opacity: 0;
+        transform: translateY(0) scale(0.5);
+      }
+      20% {
+        opacity: 1;
+        transform: translateY(-20px) scale(1.2);
+      }
+      40% {
+        opacity: 1;
+        transform: translateY(-40px) scale(1.1);
+      }
+      60% {
+        opacity: 1;
+        transform: translateY(-60px) scale(1);
+      }
+      80% {
+        opacity: 0.7;
+        transform: translateY(-80px) scale(0.9);
+      }
+      100% {
+        opacity: 0;
+        transform: translateY(-100px) scale(0.8);
+      }
+    }
+
     @media (min-width: 768px) {
       .game-container {
         padding: 25px;
@@ -1142,10 +1219,31 @@
       .difficulty-reward {
         font-size: 9px;
       }
+      
+      .combo-counter {
+        width: 60px;
+        height: 60px;
+        top: 10px;
+        left: 10px;
+      }
+      
+      .combo-count {
+        font-size: 1.5em;
+      }
+      
+      .combo-label {
+        font-size: 0.6em;
+      }
     }
   </style>
 </head>
 <body>
+  <!-- NOUVEAU : Compteur de combo -->
+  <div class="combo-counter" id="comboCounter">
+    <div class="combo-count" id="comboCount">0</div>
+    <div class="combo-label">COMBO</div>
+  </div>
+
   <div class="game-container" id="gameContainer">
     <h1>🔓 Casse les Cadenas du Coffre Magique 🔓</h1>
     <div class="squirrel-logo"></div>
@@ -1352,6 +1450,12 @@
     let recentRewards = [];
     const maxRecentRewards = 10; // Maximum de gains à afficher
     
+    // NOUVEAU : Variables pour le système de combo
+    let comboCount = 0;
+    let comboTimeout = null;
+    const comboDuration = 3000; // 3 secondes pour maintenir le combo
+    let lastAttackTime = 0;
+    
     // État des cadenas
     const locks = [
       { id: 'lock1', hp: lockHP, element: null },
@@ -1378,6 +1482,10 @@
     const jackpotAmountDisplay = document.getElementById('jackpotAmount');
     const jackpotInfo = document.getElementById('jackpotInfo');
     const recentRewardsList = document.getElementById('recentRewardsList');
+    
+    // NOUVEAU : Éléments pour le système de combo
+    const comboCounter = document.getElementById('comboCounter');
+    const comboCountDisplay = document.getElementById('comboCount');
     
     // Éléments audio
     const hammerSound = document.getElementById('hammerSound');
@@ -1428,6 +1536,61 @@
         image: 'https://i.ibb.co/N6ZGGZ93/extreme.png'
       }
     };
+    
+    // NOUVEAU : Gestion du système de combo
+    function updateCombo() {
+      const currentTime = Date.now();
+      
+      // Si l'attaque est faite dans le délai du combo
+      if (currentTime - lastAttackTime < comboDuration) {
+        comboCount++;
+      } else {
+        // Sinon, réinitialiser le combo
+        comboCount = 1;
+      }
+      
+      lastAttackTime = currentTime;
+      
+      // Mettre à jour l'affichage du combo
+      comboCountDisplay.textContent = comboCount;
+      
+      // Afficher le compteur de combo
+      comboCounter.classList.add('active');
+      
+      // Afficher un popup de combo
+      if (comboCount > 1) {
+        showComboPopup();
+      }
+      
+      // Réinitialiser le timeout du combo
+      clearTimeout(comboTimeout);
+      comboTimeout = setTimeout(() => {
+        comboCounter.classList.remove('active');
+        comboCount = 0;
+      }, comboDuration);
+    }
+    
+    // NOUVEAU : Afficher un popup de combo
+    function showComboPopup() {
+      const comboPopup = document.createElement('div');
+      comboPopup.className = 'combo-popup';
+      comboPopup.textContent = `COMBO x${comboCount}!`;
+      
+      // Position aléatoire sur le coffre
+      const chestRect = magicChest.getBoundingClientRect();
+      const x = Math.random() * (chestRect.width - 100) + 50;
+      const y = Math.random() * (chestRect.height - 50) + 25;
+      
+      comboPopup.style.left = `${x}px`;
+      comboPopup.style.top = `${y}px`;
+      
+      magicChest.appendChild(comboPopup);
+      
+      // Supprimer l'élément après l'animation
+      setTimeout(() => {
+        comboPopup.remove();
+      }, 1500);
+    }
     
     // NOUVEAU : Ajouter un gain à l'historique
     function addRecentReward(type, amount) {
@@ -1567,6 +1730,11 @@
       magicChest.classList.remove('low-hp');
       magicChest.classList.remove('shaking');
       
+      // NOUVEAU : Réinitialiser le combo
+      comboCount = 0;
+      comboCounter.classList.remove('active');
+      clearTimeout(comboTimeout);
+      
       // Mettre à jour l'affichage
       updateUI();
       
@@ -1701,6 +1869,9 @@
       
       isAttacking = true;
       let damageDealt = 0;
+      
+      // NOUVEAU : Mettre à jour le combo
+      updateCombo();
       
       // Animation du coffre qui bouge (TOUJOURS)
       shakeChest();
@@ -1860,7 +2031,9 @@
         difficulty: currentDifficulty,
         jackpotAmount: jackpotAmount,
         hitsSinceLastJackpot: hitsSinceLastJackpot,
-        recentRewards: recentRewards // Sauvegarder l'historique des gains
+        recentRewards: recentRewards, // Sauvegarder l'historique des gains
+        comboCount: comboCount, // NOUVEAU : Sauvegarder le combo
+        lastAttackTime: lastAttackTime // NOUVEAU : Sauvegarder le temps de la dernière attaque
       };
       
       localStorage.setItem('magicChestGame', JSON.stringify(gameState));
@@ -1887,6 +2060,10 @@
           jackpotAmount = gameState.jackpotAmount || jackpotAmount;
           hitsSinceLastJackpot = gameState.hitsSinceLastJackpot || hitsSinceLastJackpot;
           recentRewards = gameState.recentRewards || recentRewards; // Charger l'historique
+          
+          // NOUVEAU : Charger les données du combo
+          comboCount = gameState.comboCount || 0;
+          lastAttackTime = gameState.lastAttackTime || 0;
           
           // Mettre à jour la difficulté
           if (gameState.difficulty) {
@@ -1915,6 +2092,21 @@
             btn.classList.remove('active');
           });
           document.getElementById(`mode${attackPower}`).classList.add('active');
+          
+          // NOUVEAU : Mettre à jour l'affichage du combo
+          if (comboCount > 0 && Date.now() - lastAttackTime < comboDuration) {
+            comboCountDisplay.textContent = comboCount;
+            comboCounter.classList.add('active');
+            
+            // Redémarrer le timeout du combo
+            comboTimeout = setTimeout(() => {
+              comboCounter.classList.remove('active');
+              comboCount = 0;
+            }, comboDuration - (Date.now() - lastAttackTime));
+          } else {
+            comboCount = 0;
+            comboCounter.classList.remove('active');
+          }
           
           // Mettre à jour l'affichage des gains récents
           updateRecentRewardsDisplay();
