@@ -351,7 +351,6 @@
       }
     }
 
-    /* Nouveau rectangle transparent au-dessus des boutons de coups */
     .attack-header {
       background: rgba(255, 255, 255, 0.15);
       border-radius: 12px;
@@ -429,7 +428,6 @@
       50% { transform: translateY(-5px) scale(1.02); }
     }
 
-    /* Nouveau marteau animé */
     .hammer {
       position: absolute;
       width: 100px;
@@ -741,7 +739,6 @@
       transform: translateY(0);
     }
 
-    /* Nouveaux styles pour le jackpot et le tableau des gains */
     .jackpot-container {
       margin: 10px 0;
       padding: 12px;
@@ -776,7 +773,7 @@
       margin-top: 5px;
     }
 
-    .rewards-table-container {
+    .recent-rewards-container {
       max-height: 250px;
       overflow-y: auto;
       margin: 15px 0;
@@ -786,28 +783,38 @@
       border: 2px solid rgba(255, 215, 0, 0.3);
     }
 
-    .rewards-table {
-      width: 100%;
-      border-collapse: collapse;
+    .recent-rewards-title {
+      font-size: 1.2em;
+      color: #ffd700;
+      margin-bottom: 10px;
+      text-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
+    }
+
+    .recent-rewards-list {
+      text-align: left;
       font-size: 0.9em;
     }
 
-    .rewards-table th {
-      background: rgba(218, 165, 32, 0.3);
-      padding: 10px;
-      text-align: left;
-      color: #ffd700;
-      position: sticky;
-      top: 0;
-    }
-
-    .rewards-table td {
+    .recent-reward-item {
       padding: 8px;
       border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
     }
 
-    .rewards-table tr:hover {
-      background: rgba(255, 255, 255, 0.05);
+    .recent-reward-item:last-child {
+      border-bottom: none;
+    }
+
+    .reward-amount {
+      color: #ffd700;
+      font-weight: bold;
+    }
+
+    .reward-time {
+      font-size: 0.8em;
+      color: #daa520;
     }
 
     .jackpot-popup {
@@ -870,7 +877,6 @@
       100% { transform: rotate(360deg) scale(1); }
     }
 
-    /* Nouveaux styles pour l'affichage des dégâts */
     .damage-popup {
       position: absolute;
       font-size: 24px;
@@ -1226,7 +1232,6 @@
       <div class="hammer" id="hammer"></div>
     </div>
 
-    <!-- Nouveau rectangle transparent au-dessus des boutons de coups -->
     <div class="attack-header">
       <p>💎 Casse le coffre et gagne la récompense 💎</p>
     </div>
@@ -1266,48 +1271,15 @@
 
     <p id="message">Choisis un niveau de difficulté et clique sur "Attaquer" !</p>
     
-    <div class="rewards-table-container">
-      <table class="rewards-table">
-        <thead>
-          <tr>
-            <th>Récompense</th>
-            <th>Description</th>
-            <th>Valeur</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td>🔓 Cadenas Facile</td>
-            <td>Chaque cadena cassé</td>
-            <td>100 pièces</td>
-          </tr>
-          <tr>
-            <td>🔓 Cadenas Moyen</td>
-            <td>Chaque cadena cassé</td>
-            <td>300 pièces</td>
-          </tr>
-          <tr>
-            <td>🔓 Cadenas Difficile</td>
-            <td>Chaque cadena cassé</td>
-            <td>500 pièces</td>
-          </tr>
-          <tr>
-            <td>🔓 Cadenas Extrême</td>
-            <td>Chaque cadena cassé</td>
-            <td>1000 pièces</td>
-          </tr>
-          <tr>
-            <td>🎉 Bonus de victoire</td>
-            <td>Tous les cadenas cassés</td>
-            <td>1000-30000 pièces</td>
-          </tr>
-          <tr>
-            <td>💰 Jackpot</td>
-            <td>Chance de gagner le jackpot</td>
-            <td>Variable</td>
-          </tr>
-        </tbody>
-      </table>
+    <!-- NOUVEAU : Panneau des derniers gains -->
+    <div class="recent-rewards-container">
+      <div class="recent-rewards-title">🎯 Derniers Gains Obtenus</div>
+      <div class="recent-rewards-list" id="recentRewardsList">
+        <!-- Les gains récents seront ajoutés ici dynamiquement -->
+        <div class="recent-reward-item">
+          <span>Aucun gain encore</span>
+        </div>
+      </div>
     </div>
   </div>
 
@@ -1376,6 +1348,10 @@
     const jackpotInterval = 500; // Tous les 500 coups
     const jackpotChance = 100000; // 1 chance sur 100000
     
+    // NOUVEAU : Historique des gains récents
+    let recentRewards = [];
+    const maxRecentRewards = 10; // Maximum de gains à afficher
+    
     // État des cadenas
     const locks = [
       { id: 'lock1', hp: lockHP, element: null },
@@ -1401,6 +1377,7 @@
     const popupVictoryMessage = document.getElementById('popupVictoryMessage');
     const jackpotAmountDisplay = document.getElementById('jackpotAmount');
     const jackpotInfo = document.getElementById('jackpotInfo');
+    const recentRewardsList = document.getElementById('recentRewardsList');
     
     // Éléments audio
     const hammerSound = document.getElementById('hammerSound');
@@ -1451,6 +1428,65 @@
         image: 'https://i.ibb.co/N6ZGGZ93/extreme.png'
       }
     };
+    
+    // NOUVEAU : Ajouter un gain à l'historique
+    function addRecentReward(type, amount) {
+      const now = new Date();
+      const timeString = now.toLocaleTimeString('fr-FR', { 
+        hour: '2-digit', 
+        minute: '2-digit',
+        second: '2-digit'
+      });
+      
+      const reward = {
+        type: type,
+        amount: amount,
+        time: timeString,
+        timestamp: now.getTime()
+      };
+      
+      recentRewards.unshift(reward); // Ajouter au début
+      
+      // Garder seulement les derniers gains
+      if (recentRewards.length > maxRecentRewards) {
+        recentRewards = recentRewards.slice(0, maxRecentRewards);
+      }
+      
+      updateRecentRewardsDisplay();
+    }
+    
+    // NOUVEAU : Mettre à jour l'affichage des gains récents
+    function updateRecentRewardsDisplay() {
+      if (recentRewards.length === 0) {
+        recentRewardsList.innerHTML = `
+          <div class="recent-reward-item">
+            <span>Aucun gain encore</span>
+          </div>
+        `;
+        return;
+      }
+      
+      recentRewardsList.innerHTML = recentRewards.map(reward => `
+        <div class="recent-reward-item">
+          <div>
+            <strong>${getRewardTypeText(reward.type)}</strong>
+          </div>
+          <div class="reward-amount">+${reward.amount} pièces</div>
+          <div class="reward-time">${reward.time}</div>
+        </div>
+      `).join('');
+    }
+    
+    // NOUVEAU : Obtenir le texte du type de récompense
+    function getRewardTypeText(type) {
+      const types = {
+        'lock': '🔓 Cadena cassé',
+        'bonus': '🎉 Bonus de victoire',
+        'jackpot': '💰 JACKPOT',
+        'jackpot_contribution': '➕ Contribution jackpot'
+      };
+      return types[type] || type;
+    }
     
     // Afficher les dégâts en superposition
     function showDamagePopup(damage, isCritical = false, isMega = false) {
@@ -1639,11 +1675,18 @@
         jackpotAmount += 1;
         hitsSinceLastJackpot = 0;
         updateUI();
+        
+        // NOUVEAU : Ajouter à l'historique des gains
+        addRecentReward('jackpot_contribution', 1);
       }
       
       // Vérifier si le joueur gagne le jackpot (1 chance sur 100000 par coup)
       if (Math.random() < attackPower / jackpotChance) {
         coins += jackpotAmount;
+        
+        // NOUVEAU : Ajouter à l'historique des gains
+        addRecentReward('jackpot', jackpotAmount);
+        
         showJackpotPopup();
         message.textContent = `INCROYABLE ! Vous avez gagné le jackpot de ${jackpotAmount} pièces !`;
         
@@ -1718,6 +1761,9 @@
           const rewardAmount = difficultySettings[currentDifficulty].rewardPerLock;
           coins += rewardAmount;
           
+          // NOUVEAU : Ajouter à l'historique des gains
+          addRecentReward('lock', rewardAmount);
+          
           // Jouer le son des pièces
           playSound(coinSound);
           
@@ -1770,6 +1816,10 @@
       // Gagner le bonus de pièces
       const bonusAmount = difficultySettings[currentDifficulty].bonusReward;
       coins += bonusAmount;
+      
+      // NOUVEAU : Ajouter à l'historique des gains
+      addRecentReward('bonus', bonusAmount);
+      
       updateUI();
       
       // Jouer le son de victoire
@@ -1810,7 +1860,8 @@
         attackPower: attackPower,
         difficulty: currentDifficulty,
         jackpotAmount: jackpotAmount,
-        hitsSinceLastJackpot: hitsSinceLastJackpot
+        hitsSinceLastJackpot: hitsSinceLastJackpot,
+        recentRewards: recentRewards // NOUVEAU : Sauvegarder l'historique des gains
       };
       
       localStorage.setItem('magicChestGame', JSON.stringify(gameState));
@@ -1836,6 +1887,7 @@
           currentDifficulty = gameState.difficulty || currentDifficulty;
           jackpotAmount = gameState.jackpotAmount || jackpotAmount;
           hitsSinceLastJackpot = gameState.hitsSinceLastJackpot || hitsSinceLastJackpot;
+          recentRewards = gameState.recentRewards || recentRewards; // NOUVEAU : Charger l'historique
           
           // Mettre à jour la difficulté
           if (gameState.difficulty) {
@@ -1864,6 +1916,9 @@
             btn.classList.remove('active');
           });
           document.getElementById(`mode${attackPower}`).classList.add('active');
+          
+          // NOUVEAU : Mettre à jour l'affichage des gains récents
+          updateRecentRewardsDisplay();
           
           updateUI();
           
