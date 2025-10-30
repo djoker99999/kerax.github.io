@@ -385,7 +385,10 @@
       position: absolute;
       width: 60px;
       height: 60px;
-      font-size: 2.5em;
+      background-image: url('https://i.ibb.co/Jj5jn3ms/marteau.png');
+      background-size: contain;
+      background-repeat: no-repeat;
+      background-position: center;
       z-index: 10;
       top: -30px;
       right: -15px;
@@ -402,43 +405,6 @@
       0% { transform: rotate(0deg) translateY(0); }
       50% { transform: rotate(-45deg) translateY(15px); }
       100% { transform: rotate(0deg) translateY(0); }
-    }
-
-    .impact-effect {
-      position: absolute;
-      font-size: 2em;
-      pointer-events: none;
-      z-index: 3;
-      animation: impactPop 1s ease-out forwards;
-      opacity: 0;
-      filter: drop-shadow(0 0 10px rgba(255,255,255,0.8));
-    }
-
-    @keyframes impactPop {
-      0% { opacity: 0; transform: scale(0.3) translateY(0); }
-      30% { opacity: 1; transform: scale(1.5) translateY(-15px); }
-      100% { opacity: 0; transform: scale(1) translateY(-50px); }
-    }
-
-    .special-attack-effect {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      z-index: 100;
-      pointer-events: none;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      animation: specialEffect 2s ease-out forwards;
-    }
-
-    @keyframes specialEffect {
-      0% { opacity: 0; transform: scale(0.5); }
-      20% { opacity: 1; transform: scale(1); }
-      80% { opacity: 1; transform: scale(1); }
-      100% { opacity: 0; transform: scale(1.2); }
     }
 
     .controls {
@@ -722,6 +688,134 @@
       transform: translateY(0);
     }
 
+    /* Nouveaux styles pour le jackpot et le tableau des gains */
+    .jackpot-container {
+      margin: 15px 0;
+      padding: 15px;
+      background: rgba(255, 215, 0, 0.1);
+      border-radius: 15px;
+      border: 2px solid rgba(255, 215, 0, 0.3);
+    }
+
+    .jackpot-title {
+      font-size: 1.2em;
+      color: #ffd700;
+      margin-bottom: 10px;
+      text-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
+    }
+
+    .jackpot-amount {
+      font-size: 2em;
+      font-weight: bold;
+      color: #ffd700;
+      text-shadow: 0 0 15px rgba(255, 215, 0, 0.8);
+      animation: jackpotGlow 2s ease-in-out infinite alternate;
+    }
+
+    @keyframes jackpotGlow {
+      0% { text-shadow: 0 0 10px rgba(255, 215, 0, 0.5); }
+      100% { text-shadow: 0 0 20px rgba(255, 215, 0, 1), 0 0 30px rgba(255, 215, 0, 0.8); }
+    }
+
+    .jackpot-info {
+      font-size: 0.9em;
+      color: #daa520;
+      margin-top: 5px;
+    }
+
+    .rewards-table-container {
+      max-height: 300px;
+      overflow-y: auto;
+      margin: 20px 0;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 15px;
+      padding: 15px;
+      border: 2px solid rgba(255, 215, 0, 0.3);
+    }
+
+    .rewards-table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    .rewards-table th {
+      background: rgba(218, 165, 32, 0.3);
+      padding: 12px;
+      text-align: left;
+      color: #ffd700;
+      position: sticky;
+      top: 0;
+    }
+
+    .rewards-table td {
+      padding: 10px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .rewards-table tr:hover {
+      background: rgba(255, 255, 255, 0.05);
+    }
+
+    .jackpot-popup {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%) scale(0);
+      background: linear-gradient(135deg, #ffd700, #ffed4a);
+      color: #000;
+      padding: 30px;
+      border-radius: 20px;
+      font-weight: bold;
+      font-size: 28px;
+      z-index: 2000;
+      box-shadow: 0 0 40px rgba(255, 215, 0, 0.9);
+      border: 4px solid #daa520;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 15px;
+      animation: jackpotPopup 2s ease-in-out forwards;
+      text-align: center;
+    }
+
+    @keyframes jackpotPopup {
+      0% {
+        transform: translate(-50%, -50%) scale(0);
+        opacity: 0;
+      }
+      20% {
+        transform: translate(-50%, -50%) scale(1.4);
+        opacity: 1;
+      }
+      40% {
+        transform: translate(-50%, -50%) scale(1.2);
+        opacity: 1;
+      }
+      60% {
+        transform: translate(-50%, -50%) scale(1.3);
+        opacity: 1;
+      }
+      80% {
+        transform: translate(-50%, -50%) scale(1.25);
+        opacity: 1;
+      }
+      100% {
+        transform: translate(-50%, -50%) scale(1.3);
+        opacity: 0;
+      }
+    }
+
+    .jackpot-icon {
+      font-size: 48px;
+      animation: jackpotSpin 1s ease-in-out infinite;
+    }
+
+    @keyframes jackpotSpin {
+      0% { transform: rotate(0deg) scale(1); }
+      50% { transform: rotate(180deg) scale(1.2); }
+      100% { transform: rotate(360deg) scale(1); }
+    }
+
     @media (min-width: 768px) {
       .game-container {
         padding: 30px;
@@ -740,7 +834,6 @@
       .hammer {
         width: 80px;
         height: 80px;
-        font-size: 3em;
         top: -40px;
         right: -20px;
       }
@@ -818,6 +911,11 @@
       .sound-controls {
         width: 180px;
       }
+      
+      .jackpot-popup {
+        font-size: 20px;
+        padding: 20px;
+      }
     }
   </style>
 </head>
@@ -860,6 +958,17 @@
         <div class="difficulty-label">Difficile</div>
         <div class="difficulty-reward">5000 pièces</div>
       </div>
+      <div id="difficultyExtreme" class="difficulty-level">
+        <img src="https://i.ibb.co/N6ZGGZ93/extreme.png" alt="Extrême">
+        <div class="difficulty-label">Extrême</div>
+        <div class="difficulty-reward">30000 pièces</div>
+      </div>
+    </div>
+    
+    <div class="jackpot-container">
+      <div class="jackpot-title">JACKPOT</div>
+      <div class="jackpot-amount" id="jackpotAmount">0 pièces</div>
+      <div class="jackpot-info" id="jackpotInfo">Tous les 500 coups, 1 pièce est ajoutée au jackpot</div>
     </div>
     
     <div class="stats">
@@ -870,6 +979,10 @@
       <div class="stat">
         <div class="stat-value" id="locksBroken">0/4</div>
         <div class="stat-label">Cadenas Cassés</div>
+      </div>
+      <div class="stat">
+        <div class="stat-value" id="totalHits">0</div>
+        <div class="stat-label">Total Coups</div>
       </div>
     </div>
     
@@ -890,7 +1003,7 @@
       </div>
       
       <div class="magic-chest" id="magicChest"></div>
-      <div class="hammer" id="hammer">🔨</div>
+      <div class="hammer" id="hammer"></div>
     </div>
 
     <div class="attack-modes">
@@ -927,6 +1040,50 @@
     </div>
 
     <p id="message">Choisis un niveau de difficulté et clique sur "Attaquer" !</p>
+    
+    <div class="rewards-table-container">
+      <table class="rewards-table">
+        <thead>
+          <tr>
+            <th>Récompense</th>
+            <th>Description</th>
+            <th>Valeur</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>🔓 Cadenas Facile</td>
+            <td>Chaque cadena cassé</td>
+            <td>100 pièces</td>
+          </tr>
+          <tr>
+            <td>🔓 Cadenas Moyen</td>
+            <td>Chaque cadena cassé</td>
+            <td>300 pièces</td>
+          </tr>
+          <tr>
+            <td>🔓 Cadenas Difficile</td>
+            <td>Chaque cadena cassé</td>
+            <td>500 pièces</td>
+          </tr>
+          <tr>
+            <td>🔓 Cadenas Extrême</td>
+            <td>Chaque cadena cassé</td>
+            <td>1000 pièces</td>
+          </tr>
+          <tr>
+            <td>🎉 Bonus de victoire</td>
+            <td>Tous les cadenas cassés</td>
+            <td>1000-30000 pièces</td>
+          </tr>
+          <tr>
+            <td>💰 Jackpot</td>
+            <td>Chance de gagner le jackpot</td>
+            <td>Variable</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
   </div>
 
   <div class="save-indicator" id="saveIndicator">Partie sauvegardée !</div>
@@ -957,12 +1114,26 @@
   <audio id="backgroundMusic" loop preload="auto">
     <source src="https://assets.mixkit.co/music/preview/mixkit-game-show-suspense-waiting-667.mp3" type="audio/mpeg">
   </audio>
+  <!-- Nouveaux sons pour les attaques spéciales -->
+  <audio id="attack100Sound" preload="auto">
+    <source src="https://files.catbox.moe/4q91kf.wav" type="audio/wav">
+  </audio>
+  <audio id="attack500Sound" preload="auto">
+    <source src="https://files.catbox.moe/g01f2e.wav" type="audio/wav">
+  </audio>
+  <audio id="attack1000Sound" preload="auto">
+    <source src="https://files.catbox.moe/g9w4ne.wav" type="audio/wav">
+  </audio>
+  <audio id="jackpotSound" preload="auto">
+    <source src="https://assets.mixkit.co/sfx/preview/mixkit-winning-chimes-2015.mp3" type="audio/mpeg">
+  </audio>
 
   <script>
     // Variables du jeu
     let coins = 0;
     let attackPower = 1;
     let locksBroken = 0;
+    let totalHits = 0;
     const maxLocks = 4;
     let lockHP = 1300; // Base HP pour le niveau facile
     let isAttacking = false;
@@ -973,6 +1144,12 @@
     let effectsVolume = 0.7;
     let musicVolume = 0.3;
     let soundEnabled = true;
+    
+    // Variables pour le jackpot
+    let jackpotAmount = 0;
+    let hitsSinceLastJackpot = 0;
+    const jackpotInterval = 500; // Tous les 500 coups
+    const jackpotChance = 100000; // 1 chance sur 100000
     
     // État des cadenas
     const locks = [
@@ -985,6 +1162,7 @@
     // Éléments DOM
     const coinsCount = document.getElementById('coinsCount');
     const locksBrokenCount = document.getElementById('locksBroken');
+    const totalHitsCount = document.getElementById('totalHits');
     const message = document.getElementById('message');
     const attackBtn = document.getElementById('attackBtn');
     const resetBtn = document.getElementById('resetBtn');
@@ -996,6 +1174,8 @@
     const saveIndicator = document.getElementById('saveIndicator');
     const popupRewardImage = document.getElementById('popupRewardImage');
     const popupVictoryMessage = document.getElementById('popupVictoryMessage');
+    const jackpotAmountDisplay = document.getElementById('jackpotAmount');
+    const jackpotInfo = document.getElementById('jackpotInfo');
     
     // Éléments audio
     const hammerSound = document.getElementById('hammerSound');
@@ -1003,13 +1183,10 @@
     const coinSound = document.getElementById('coinSound');
     const victorySound = document.getElementById('victorySound');
     const backgroundMusic = document.getElementById('backgroundMusic');
-    
-    // Éléments de contrôle du son
-    const soundToggle = document.getElementById('soundToggle');
-    const soundControls = document.getElementById('soundControls');
-    const masterVolumeSlider = document.getElementById('masterVolume');
-    const effectsVolumeSlider = document.getElementById('effectsVolume');
-    const musicVolumeSlider = document.getElementById('musicVolume');
+    const attack100Sound = document.getElementById('attack100Sound');
+    const attack500Sound = document.getElementById('attack500Sound');
+    const attack1000Sound = document.getElementById('attack1000Sound');
+    const jackpotSound = document.getElementById('jackpotSound');
     
     // Configuration des niveaux de difficulté
     const difficultySettings = {
@@ -1033,12 +1210,18 @@
         rewardPerLock: 500,
         bonusReward: 5000,
         image: 'https://i.ibb.co/gbvXGqHj/IMG-7356-Photoroom.png'
+      },
+      extreme: {
+        name: 'Extrême',
+        lockHP: 40000, // 40 000 HP pour le niveau extrême
+        rewardPerLock: 1000, // 1000 pièces par cadena
+        bonusReward: 30000, // 30 000 pièces bonus
+        image: 'https://i.ibb.co/N6ZGGZ93/extreme.png'
       }
     };
     
     // Initialisation du jeu
     function initGame() {
-      coins = 0;
       attackPower = 1;
       locksBroken = 0;
       isAttacking = false;
@@ -1088,6 +1271,9 @@
     function updateUI() {
       coinsCount.textContent = coins;
       locksBrokenCount.textContent = `${locksBroken}/${maxLocks}`;
+      totalHitsCount.textContent = totalHits;
+      jackpotAmountDisplay.textContent = `${jackpotAmount} pièces`;
+      jackpotInfo.textContent = `Tous les ${jackpotInterval} coups, 1 pièce est ajoutée au jackpot (${hitsSinceLastJackpot}/${jackpotInterval})`;
     }
     
     // Jouer un son
@@ -1134,17 +1320,47 @@
       }, 1500);
     }
     
-    // Créer un effet d'attaque spécial
-    function createSpecialAttackEffect(gifUrl) {
-      const effect = document.createElement('div');
-      effect.className = 'special-attack-effect';
-      effect.innerHTML = `<img src="${gifUrl}" style="max-width: 100%; max-height: 100%;">`;
+    // Afficher la popup de jackpot
+    function showJackpotPopup() {
+      const jackpotPopup = document.createElement('div');
+      jackpotPopup.className = 'jackpot-popup';
+      jackpotPopup.innerHTML = `
+        <div class="jackpot-icon">💰</div>
+        <div>JACKPOT GAGNÉ !</div>
+        <div>${jackpotAmount} pièces !</div>
+      `;
       
-      document.body.appendChild(effect);
+      document.body.appendChild(jackpotPopup);
+      
+      // Jouer le son du jackpot
+      playSound(jackpotSound);
       
       setTimeout(() => {
-        effect.remove();
+        jackpotPopup.remove();
       }, 2000);
+    }
+    
+    // Gérer le système de jackpot
+    function handleJackpot() {
+      hitsSinceLastJackpot += attackPower;
+      
+      // Ajouter une pièce au jackpot tous les 500 coups
+      if (hitsSinceLastJackpot >= jackpotInterval) {
+        jackpotAmount += 1;
+        hitsSinceLastJackpot = 0;
+        updateUI();
+      }
+      
+      // Vérifier si le joueur gagne le jackpot (1 chance sur 100000 par coup)
+      if (Math.random() < attackPower / jackpotChance) {
+        coins += jackpotAmount;
+        showJackpotPopup();
+        message.textContent = `INCROYABLE ! Vous avez gagné le jackpot de ${jackpotAmount} pièces !`;
+        
+        // Réinitialiser le jackpot
+        jackpotAmount = 0;
+        updateUI();
+      }
     }
     
     // Attaquer les cadenas
@@ -1154,27 +1370,27 @@
       isAttacking = true;
       let damageDealt = 0;
       
-      // Effets spéciaux pour les gros nombres de coups
-      if (attackPower === 100) {
-        createSpecialAttackEffect('https://i.gifer.com/Dhdg.gif');
-      } else if (attackPower === 500) {
-        createSpecialAttackEffect('https://i.gifer.com/Dhdh.gif');
-      } else if (attackPower === 1000) {
-        createSpecialAttackEffect('https://i.gifer.com/Dhdh.gif');
-      }
-      
       // Animation du marteau seulement pour les petits nombres de coups
       if (attackPower <= 10) {
         hammer.classList.add('hitting');
       }
       
-      // Jouer le son du marteau pour chaque coup (avec un délai pour éviter la surcharge)
-      if (attackPower <= 10) {
+      // Jouer le son approprié selon le mode d'attaque
+      if (attackPower === 100) {
+        playSound(attack100Sound);
+      } else if (attackPower === 500) {
+        playSound(attack500Sound);
+      } else if (attackPower === 1000) {
+        playSound(attack1000Sound);
+      } else if (attackPower <= 10) {
         playSound(hammerSound);
       } else {
-        // Pour les gros nombres de coups, jouer le son une seule fois
+        // Pour les autres nombres de coups, jouer le son du marteau une seule fois
         setTimeout(() => playSound(hammerSound), 100);
       }
+      
+      // Gérer le système de jackpot
+      handleJackpot();
       
       // Trouver un cadena non cassé au hasard (UNE SEULE FOIS pour tous les coups)
       const activeLocks = locks.filter(lock => lock.hp > 0);
@@ -1193,11 +1409,7 @@
         // Appliquer des dégâts
         targetLock.hp -= 1;
         damageDealt += 1;
-        
-        // Créer un effet d'impact pour tous les coups, mais avec une fréquence réduite pour les gros nombres
-        if (attackPower <= 10 || i % Math.max(1, Math.floor(attackPower / 10)) === 0) {
-          createImpactEffect(targetLock.element, "💥");
-        }
+        totalHits += 1;
         
         // Vérifier si le cadena est cassé
         if (targetLock.hp <= 0) {
@@ -1241,23 +1453,6 @@
         hammer.classList.remove('hitting');
         isAttacking = false;
       }, 400);
-    }
-    
-    // Créer un effet d'impact visuel
-    function createImpactEffect(target, effect) {
-      const impact = document.createElement('div');
-      impact.className = 'impact-effect';
-      impact.textContent = effect;
-      
-      const rect = target.getBoundingClientRect();
-      impact.style.left = `${rect.left + rect.width/2}px`;
-      impact.style.top = `${rect.top}px`;
-      
-      document.body.appendChild(impact);
-      
-      setTimeout(() => {
-        impact.remove();
-      }, 1000);
     }
     
     // Afficher les pièces gagnées
@@ -1312,9 +1507,12 @@
       const gameState = {
         coins: coins,
         locksBroken: locksBroken,
+        totalHits: totalHits,
         locks: locks.map(lock => ({ id: lock.id, hp: lock.hp })),
         attackPower: attackPower,
-        difficulty: currentDifficulty
+        difficulty: currentDifficulty,
+        jackpotAmount: jackpotAmount,
+        hitsSinceLastJackpot: hitsSinceLastJackpot
       };
       
       localStorage.setItem('magicChestGame', JSON.stringify(gameState));
@@ -1335,8 +1533,11 @@
           
           coins = gameState.coins || coins;
           locksBroken = gameState.locksBroken || locksBroken;
+          totalHits = gameState.totalHits || totalHits;
           attackPower = gameState.attackPower || attackPower;
           currentDifficulty = gameState.difficulty || currentDifficulty;
+          jackpotAmount = gameState.jackpotAmount || jackpotAmount;
+          hitsSinceLastJackpot = gameState.hitsSinceLastJackpot || hitsSinceLastJackpot;
           
           // Mettre à jour la difficulté
           if (gameState.difficulty) {
@@ -1407,6 +1608,7 @@
     document.getElementById("difficultyEasy").addEventListener("click", () => setDifficulty('easy'));
     document.getElementById("difficultyMedium").addEventListener("click", () => setDifficulty('medium'));
     document.getElementById("difficultyHard").addEventListener("click", () => setDifficulty('hard'));
+    document.getElementById("difficultyExtreme").addEventListener("click", () => setDifficulty('extreme'));
 
     // Événements pour les modes d'attaque
     document.getElementById("mode1").addEventListener("click", () => setAttackMode(1));
@@ -1459,6 +1661,8 @@
         setDifficulty('medium');
       } else if (e.key === 'h' || e.key === 'H') {
         setDifficulty('hard');
+      } else if (e.key === 'e' || e.key === 'E') {
+        setDifficulty('extreme');
       } else if (e.key === 'a' || e.key === 'A') {
         toggleSound();
       } else if (e.key === 'Escape') {
