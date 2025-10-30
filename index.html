@@ -1346,7 +1346,7 @@
     let jackpotAmount = 1000; // Jackpot de départ à 1000 pièces
     let hitsSinceLastJackpot = 0;
     const jackpotInterval = 500; // Tous les 500 coups
-    const jackpotChance = 100000; // 1 chance sur 100000
+    const jackpotChance = 1000000; // CORRECTION: 1 chance sur 1 million (au lieu de 100000)
     
     // NOUVEAU : Historique des gains récents
     let recentRewards = [];
@@ -1677,11 +1677,9 @@
         jackpotAmount += 1;
         hitsSinceLastJackpot = 0;
         updateUI();
-        
-        // NE PAS ajouter à l'historique des gains (supprimé)
       }
       
-      // Vérifier si le joueur gagne le jackpot (1 chance sur 100000 par coup)
+      // CORRECTION: Vérifier si le joueur gagne le jackpot (1 chance sur 1 million par coup)
       if (Math.random() < attackPower / jackpotChance) {
         coins += jackpotAmount;
         
@@ -1961,7 +1959,7 @@
       victoryPopup.classList.remove('active');
     });
 
-    // Événements pour les niveaux de difficulté
+    // CORRECTION: Événements pour les niveaux de difficulté - utilisation des bonnes majuscules
     document.getElementById("difficultyEasy").addEventListener("click", () => setDifficulty('easy'));
     document.getElementById("difficultyMedium").addEventListener("click", () => setDifficulty('medium'));
     document.getElementById("difficultyHard").addEventListener("click", () => setDifficulty('hard'));
