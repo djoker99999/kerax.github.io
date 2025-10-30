@@ -238,26 +238,6 @@
       animation: none;
     }
 
-    .hp-bar {
-      position: absolute;
-      bottom: -25px;
-      left: 50%;
-      transform: translateX(-50%);
-      width: 70px;
-      height: 8px;
-      background: rgba(0, 0, 0, 0.5);
-      border-radius: 4px;
-      overflow: hidden;
-      border: 1px solid rgba(255, 255, 255, 0.3);
-    }
-
-    .hp-fill {
-      height: 100%;
-      background: linear-gradient(90deg, #4CAF50, #8BC34A);
-      transition: width 0.5s ease;
-      border-radius: 4px;
-    }
-
     .coins-earned {
       position: absolute;
       top: -30px;
@@ -438,6 +418,27 @@
       0% { opacity: 0; transform: scale(0.3) translateY(0); }
       30% { opacity: 1; transform: scale(1.5) translateY(-15px); }
       100% { opacity: 0; transform: scale(1) translateY(-50px); }
+    }
+
+    .special-attack-effect {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 100;
+      pointer-events: none;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      animation: specialEffect 2s ease-out forwards;
+    }
+
+    @keyframes specialEffect {
+      0% { opacity: 0; transform: scale(0.5); }
+      20% { opacity: 1; transform: scale(1); }
+      80% { opacity: 1; transform: scale(1); }
+      100% { opacity: 0; transform: scale(1.2); }
     }
 
     .controls {
@@ -876,27 +877,15 @@
       <div class="locks-container">
         <div class="lock" id="lock1">
           <div class="lock-image"></div>
-          <div class="hp-bar">
-            <div class="hp-fill" id="lock1HP" style="width: 100%;"></div>
-          </div>
         </div>
         <div class="lock" id="lock2">
           <div class="lock-image"></div>
-          <div class="hp-bar">
-            <div class="hp-fill" id="lock2HP" style="width: 100%;"></div>
-          </div>
         </div>
         <div class="lock" id="lock3">
           <div class="lock-image"></div>
-          <div class="hp-bar">
-            <div class="hp-fill" id="lock3HP" style="width: 100%;"></div>
-          </div>
         </div>
         <div class="lock" id="lock4">
           <div class="lock-image"></div>
-          <div class="hp-bar">
-            <div class="hp-fill" id="lock4HP" style="width: 100%;"></div>
-          </div>
         </div>
       </div>
       
@@ -954,7 +943,7 @@
 
   <!-- Sons intégrés -->
   <audio id="hammerSound" preload="auto">
-    <source src="https://assets.mixkit.co/sfx/preview/mixkit-hammer-hit-751.mp3" type="audio/mpeg">
+    <source src="https://files.catbox.moe/fp8aq6.mp3" type="audio/mpeg">
   </audio>
   <audio id="lockBreakSound" preload="auto">
     <source src="https://assets.mixkit.co/sfx/preview/mixkit-breaking-glass-389.mp3" type="audio/mpeg">
@@ -987,10 +976,10 @@
     
     // État des cadenas
     const locks = [
-      { id: 'lock1', hp: lockHP, element: null, hpBar: null },
-      { id: 'lock2', hp: lockHP, element: null, hpBar: null },
-      { id: 'lock3', hp: lockHP, element: null, hpBar: null },
-      { id: 'lock4', hp: lockHP, element: null, hpBar: null }
+      { id: 'lock1', hp: lockHP, element: null },
+      { id: 'lock2', hp: lockHP, element: null },
+      { id: 'lock3', hp: lockHP, element: null },
+      { id: 'lock4', hp: lockHP, element: null }
     ];
     
     // Éléments DOM
@@ -1058,10 +1047,7 @@
       locks.forEach(lock => {
         lock.hp = lockHP;
         lock.element = document.getElementById(lock.id);
-        lock.hpBar = document.getElementById(lock.id + 'HP');
-        
         lock.element.classList.remove('broken');
-        lock.hpBar.style.width = '100%';
       });
       
       // Réinitialiser les modes d'attaque
@@ -1148,6 +1134,19 @@
       }, 1500);
     }
     
+    // Créer un effet d'attaque spécial
+    function createSpecialAttackEffect(gifUrl) {
+      const effect = document.createElement('div');
+      effect.className = 'special-attack-effect';
+      effect.innerHTML = `<img src="${gifUrl}" style="max-width: 100%; max-height: 100%;">`;
+      
+      document.body.appendChild(effect);
+      
+      setTimeout(() => {
+        effect.remove();
+      }, 2000);
+    }
+    
     // Attaquer les cadenas
     function attack() {
       if (locksBroken >= maxLocks || isAttacking) return;
@@ -1155,10 +1154,26 @@
       isAttacking = true;
       let damageDealt = 0;
       
+      // Effets spéciaux pour les gros nombres de coups
+      if (attackPower === 100) {
+        createSpecialAttackEffect('https://i.gifer.com/Dhdg.gif');
+      } else if (attackPower === 500) {
+        createSpecialAttackEffect('https://i.gifer.com/Dhdh.gif');
+      } else if (attackPower === 1000) {
+        createSpecialAttackEffect('https://i.gifer.com/Dhdh.gif');
+      }
+      
       // Animation du marteau seulement pour les petits nombres de coups
       if (attackPower <= 10) {
         hammer.classList.add('hitting');
+      }
+      
+      // Jouer le son du marteau pour chaque coup (avec un délai pour éviter la surcharge)
+      if (attackPower <= 10) {
         playSound(hammerSound);
+      } else {
+        // Pour les gros nombres de coups, jouer le son une seule fois
+        setTimeout(() => playSound(hammerSound), 100);
       }
       
       // Trouver un cadena non cassé au hasard (UNE SEULE FOIS pour tous les coups)
@@ -1179,14 +1194,8 @@
         targetLock.hp -= 1;
         damageDealt += 1;
         
-        // Mettre à jour la barre de vie (seulement toutes les 10 dégâts pour les gros nombres)
-        if (attackPower <= 10 || i % 10 === 0 || i === attackPower - 1) {
-          const hpPercentage = (targetLock.hp / lockHP) * 100;
-          targetLock.hpBar.style.width = `${hpPercentage}%`;
-        }
-        
-        // Créer un effet d'impact seulement pour les petits nombres de coups
-        if (attackPower <= 10) {
+        // Créer un effet d'impact pour tous les coups, mais avec une fréquence réduite pour les gros nombres
+        if (attackPower <= 10 || i % Math.max(1, Math.floor(attackPower / 10)) === 0) {
           createImpactEffect(targetLock.element, "💥");
         }
         
@@ -1340,10 +1349,6 @@
               const lock = locks.find(l => l.id === savedLock.id);
               if (lock) {
                 lock.hp = savedLock.hp;
-                
-                // Mettre à jour l'affichage
-                const hpPercentage = (lock.hp / lockHP) * 100;
-                lock.hpBar.style.width = `${hpPercentage}%`;
                 
                 if (lock.hp <= 0) {
                   lock.element.classList.add('broken');
