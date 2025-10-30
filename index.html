@@ -1431,6 +1431,9 @@
     
     // NOUVEAU : Ajouter un gain à l'historique
     function addRecentReward(type, amount) {
+      // Ne pas ajouter les contributions au jackpot dans l'historique
+      if (type === 'jackpot_contribution') return;
+      
       const now = new Date();
       const timeString = now.toLocaleTimeString('fr-FR', { 
         hour: '2-digit', 
@@ -1482,8 +1485,7 @@
       const types = {
         'lock': '🔓 Cadena cassé',
         'bonus': '🎉 Bonus de victoire',
-        'jackpot': '💰 JACKPOT',
-        'jackpot_contribution': '➕ Contribution jackpot'
+        'jackpot': '💰 JACKPOT'
       };
       return types[type] || type;
     }
@@ -1676,15 +1678,14 @@
         hitsSinceLastJackpot = 0;
         updateUI();
         
-        // NOUVEAU : Ajouter à l'historique des gains
-        addRecentReward('jackpot_contribution', 1);
+        // NE PAS ajouter à l'historique des gains (supprimé)
       }
       
       // Vérifier si le joueur gagne le jackpot (1 chance sur 100000 par coup)
       if (Math.random() < attackPower / jackpotChance) {
         coins += jackpotAmount;
         
-        // NOUVEAU : Ajouter à l'historique des gains
+        // Ajouter à l'historique des gains
         addRecentReward('jackpot', jackpotAmount);
         
         showJackpotPopup();
@@ -1761,7 +1762,7 @@
           const rewardAmount = difficultySettings[currentDifficulty].rewardPerLock;
           coins += rewardAmount;
           
-          // NOUVEAU : Ajouter à l'historique des gains
+          // Ajouter à l'historique des gains
           addRecentReward('lock', rewardAmount);
           
           // Jouer le son des pièces
@@ -1817,7 +1818,7 @@
       const bonusAmount = difficultySettings[currentDifficulty].bonusReward;
       coins += bonusAmount;
       
-      // NOUVEAU : Ajouter à l'historique des gains
+      // Ajouter à l'historique des gains
       addRecentReward('bonus', bonusAmount);
       
       updateUI();
@@ -1861,7 +1862,7 @@
         difficulty: currentDifficulty,
         jackpotAmount: jackpotAmount,
         hitsSinceLastJackpot: hitsSinceLastJackpot,
-        recentRewards: recentRewards // NOUVEAU : Sauvegarder l'historique des gains
+        recentRewards: recentRewards // Sauvegarder l'historique des gains
       };
       
       localStorage.setItem('magicChestGame', JSON.stringify(gameState));
@@ -1887,7 +1888,7 @@
           currentDifficulty = gameState.difficulty || currentDifficulty;
           jackpotAmount = gameState.jackpotAmount || jackpotAmount;
           hitsSinceLastJackpot = gameState.hitsSinceLastJackpot || hitsSinceLastJackpot;
-          recentRewards = gameState.recentRewards || recentRewards; // NOUVEAU : Charger l'historique
+          recentRewards = gameState.recentRewards || recentRewards; // Charger l'historique
           
           // Mettre à jour la difficulté
           if (gameState.difficulty) {
@@ -1917,7 +1918,7 @@
           });
           document.getElementById(`mode${attackPower}`).classList.add('active');
           
-          // NOUVEAU : Mettre à jour l'affichage des gains récents
+          // Mettre à jour l'affichage des gains récents
           updateRecentRewardsDisplay();
           
           updateUI();
