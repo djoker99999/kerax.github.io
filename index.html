@@ -185,6 +185,17 @@
       z-index: 5;
     }
 
+    .magic-chest.shaking {
+      animation: chestShake 0.3s ease-in-out;
+    }
+
+    @keyframes chestShake {
+      0%, 100% { transform: translateX(0) rotate(0deg); }
+      25% { transform: translateX(-3px) rotate(-1deg); }
+      50% { transform: translateX(3px) rotate(1deg); }
+      75% { transform: translateX(-2px) rotate(-0.5deg); }
+    }
+
     .magic-chest.low-hp {
       filter: drop-shadow(0 0 20px rgba(255, 0, 0, 0.8)) brightness(1.3) contrast(1.2) hue-rotate(-30deg);
       animation: chestPulse 1s ease-in-out infinite;
@@ -1463,6 +1474,14 @@
       }, 2000);
     }
     
+    // Animation du coffre qui bouge
+    function shakeChest() {
+      magicChest.classList.add('shaking');
+      setTimeout(() => {
+        magicChest.classList.remove('shaking');
+      }, 300);
+    }
+    
     // Vérifier si le coffre doit devenir rouge
     function checkChestState() {
       const activeLocks = locks.filter(lock => lock.hp > 0);
@@ -1499,6 +1518,7 @@
       
       // Réinitialiser l'état du coffre
       magicChest.classList.remove('low-hp');
+      magicChest.classList.remove('shaking');
       
       // Mettre à jour l'affichage
       updateUI();
@@ -1631,10 +1651,11 @@
       isAttacking = true;
       let damageDealt = 0;
       
-      // Animation du marteau seulement pour les petits nombres de coups
-      if (attackPower <= 10) {
-        hammer.classList.add('hitting');
-      }
+      // Animation du coffre qui bouge (TOUJOURS)
+      shakeChest();
+      
+      // Animation du marteau (TOUJOURS, même pour les gros coups)
+      hammer.classList.add('hitting');
       
       // Jouer le son approprié selon le mode d'attaque
       if (attackPower === 100) {
@@ -1643,11 +1664,8 @@
         playSound(attack500Sound);
       } else if (attackPower === 1000) {
         playSound(attack1000Sound);
-      } else if (attackPower <= 10) {
-        playSound(hammerSound);
       } else {
-        // Pour les autres nombres de coups, jouer le son du marteau une seule fois
-        setTimeout(() => playSound(hammerSound), 100);
+        playSound(hammerSound);
       }
       
       // Gérer le système de jackpot
