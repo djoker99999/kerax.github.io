@@ -1055,6 +1055,56 @@
       }
     }
 
+    /* Nouveaux styles pour les gains */
+    .gains-container {
+      margin: 15px 0;
+      padding: 15px;
+      background: rgba(255, 215, 0, 0.1);
+      border-radius: 12px;
+      border: 2px solid rgba(255, 215, 0, 0.3);
+    }
+
+    .gains-title {
+      font-size: 1.2em;
+      color: #ffd700;
+      margin-bottom: 10px;
+      text-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
+    }
+
+    .gains-stats {
+      display: flex;
+      justify-content: space-around;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .gain-stat {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 8px 12px;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 8px;
+      min-width: 100px;
+    }
+
+    .gain-value {
+      font-size: 1.4em;
+      font-weight: bold;
+      color: #ffd700;
+    }
+
+    .gain-label {
+      font-size: 0.8em;
+      color: #daa520;
+      margin-top: 3px;
+    }
+
+    .total-gains {
+      background: rgba(255, 215, 0, 0.2);
+      border: 1px solid rgba(255, 215, 0, 0.5);
+    }
+
     @media (min-width: 768px) {
       .game-container {
         padding: 25px;
@@ -1228,6 +1278,23 @@
       .combo-label {
         font-size: 0.6em;
       }
+
+      .gains-stats {
+        gap: 5px;
+      }
+
+      .gain-stat {
+        min-width: 80px;
+        padding: 6px 8px;
+      }
+
+      .gain-value {
+        font-size: 1.2em;
+      }
+
+      .gain-label {
+        font-size: 0.7em;
+      }
     }
   </style>
 </head>
@@ -1286,6 +1353,29 @@
     <div class="jackpot-container">
       <div class="jackpot-title">JACKPOT</div>
       <div class="jackpot-amount" id="jackpotAmount">1000 pièces</div>
+    </div>
+
+    <!-- NOUVEAU: Section des gains -->
+    <div class="gains-container">
+      <div class="gains-title">💰 VOS GAINS 💰</div>
+      <div class="gains-stats">
+        <div class="gain-stat total-gains">
+          <div class="gain-value" id="totalGains">0</div>
+          <div class="gain-label">Total Gains</div>
+        </div>
+        <div class="gain-stat">
+          <div class="gain-value" id="sessionGains">0</div>
+          <div class="gain-label">Cette Session</div>
+        </div>
+        <div class="gain-stat">
+          <div class="gain-value" id="locksGains">0</div>
+          <div class="gain-label">Par Cadenas</div>
+        </div>
+        <div class="gain-stat">
+          <div class="gain-value" id="bonusGains">0</div>
+          <div class="gain-label">Bonus</div>
+        </div>
+      </div>
     </div>
     
     <div class="stats">
@@ -1427,6 +1517,12 @@
     let isAttacking = false;
     let currentDifficulty = 'easy';
     
+    // NOUVELLES VARIABLES POUR LES GAINS
+    let totalGains = 0;
+    let sessionGains = 0;
+    let locksGains = 0;
+    let bonusGains = 0;
+    
     // Variables pour le son
     let masterVolume = 0.5;
     let effectsVolume = 0.7;
@@ -1474,6 +1570,12 @@
     const popupVictoryMessage = document.getElementById('popupVictoryMessage');
     const jackpotAmountDisplay = document.getElementById('jackpotAmount');
     const recentRewardsList = document.getElementById('recentRewardsList');
+    
+    // NOUVEAUX ÉLÉMENTS POUR LES GAINS
+    const totalGainsDisplay = document.getElementById('totalGains');
+    const sessionGainsDisplay = document.getElementById('sessionGains');
+    const locksGainsDisplay = document.getElementById('locksGains');
+    const bonusGainsDisplay = document.getElementById('bonusGains');
     
     // Éléments pour le système de combo
     const comboCounter = document.getElementById('comboCounter');
@@ -1528,6 +1630,32 @@
         image: 'https://i.ibb.co/N6ZGGZ93/extreme.png'
       }
     };
+
+    // NOUVELLE FONCTION: Mettre à jour l'affichage des gains
+    function updateGainsDisplay() {
+      totalGainsDisplay.textContent = totalGains;
+      sessionGainsDisplay.textContent = sessionGains;
+      locksGainsDisplay.textContent = locksGains;
+      bonusGainsDisplay.textContent = bonusGains;
+    }
+
+    // NOUVELLE FONCTION: Ajouter des gains
+    function addGains(amount, type) {
+      coins += amount;
+      totalGains += amount;
+      sessionGains += amount;
+      
+      if (type === 'lock') {
+        locksGains += amount;
+      } else if (type === 'bonus') {
+        bonusGains += amount;
+      } else if (type === 'jackpot') {
+        // Pour le jackpot, on ne l'ajoute pas aux catégories spécifiques
+      }
+      
+      updateGainsDisplay();
+      updateUI();
+    }
     
     // Gestion du système de combo
     function updateCombo() {
@@ -1842,7 +1970,8 @@
       
       // Vérifier si le joueur gagne le jackpot (1 chance sur 1 milliard par coup)
       if (Math.random() < attackPower / jackpotChance) {
-        coins += jackpotAmount;
+        // MODIFICATION: Utiliser la nouvelle fonction addGains
+        addGains(jackpotAmount, 'jackpot');
         
         // Ajouter à l'historique des gains
         addRecentReward('jackpot', jackpotAmount);
@@ -1922,7 +2051,9 @@
           
           // Gagner des pièces pour chaque cadena cassé
           const rewardAmount = difficultySettings[currentDifficulty].rewardPerLock;
-          coins += rewardAmount;
+          
+          // MODIFICATION: Utiliser la nouvelle fonction addGains
+          addGains(rewardAmount, 'lock');
           
           // Ajouter à l'historique des gains
           addRecentReward('lock', rewardAmount);
@@ -1978,7 +2109,9 @@
     function endGame() {
       // Gagner le bonus de pièces
       const bonusAmount = difficultySettings[currentDifficulty].bonusReward;
-      coins += bonusAmount;
+      
+      // MODIFICATION: Utiliser la nouvelle fonction addGains
+      addGains(bonusAmount, 'bonus');
       
       // Ajouter à l'historique des gains
       addRecentReward('bonus', bonusAmount);
@@ -2026,7 +2159,13 @@
         hitsSinceLastJackpot: hitsSinceLastJackpot,
         recentRewards: recentRewards, // Sauvegarder l'historique des gains
         comboCount: comboCount, // Sauvegarder le combo
-        lastAttackTime: lastAttackTime // Sauvegarder le temps de la dernière attaque
+        lastAttackTime: lastAttackTime, // Sauvegarder le temps de la dernière attaque
+        
+        // NOUVEAU: Sauvegarder les données de gains
+        totalGains: totalGains,
+        sessionGains: sessionGains,
+        locksGains: locksGains,
+        bonusGains: bonusGains
       };
       
       localStorage.setItem('magicChestGame', JSON.stringify(gameState));
@@ -2057,6 +2196,12 @@
           // Charger les données du combo
           comboCount = gameState.comboCount || 0;
           lastAttackTime = gameState.lastAttackTime || 0;
+          
+          // NOUVEAU: Charger les données de gains
+          totalGains = gameState.totalGains || 0;
+          sessionGains = gameState.sessionGains || 0;
+          locksGains = gameState.locksGains || 0;
+          bonusGains = gameState.bonusGains || 0;
           
           // Mettre à jour la difficulté
           if (gameState.difficulty) {
@@ -2100,6 +2245,9 @@
             comboCount = 0;
             comboCounter.classList.remove('active');
           }
+          
+          // Mettre à jour l'affichage des gains
+          updateGainsDisplay();
           
           // Mettre à jour l'affichage des gains récents
           updateRecentRewardsDisplay();
