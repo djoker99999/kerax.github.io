@@ -1699,13 +1699,13 @@
       }
     }
     
-    // Initialisation du jeu
-    function initGame() {
+    // Initialisation du jeu - NOUVELLE VERSION
+    function initGame(loadSave = false) {
       attackPower = 1;
       locksBroken = 0;
       isAttacking = false;
       
-      // Réinitialiser les cadenas
+      // Réinitialiser les cadenas avec la nouvelle difficulté
       locks.forEach(lock => {
         lock.hp = lockHP;
         lock.element = document.getElementById(lock.id);
@@ -1736,11 +1736,13 @@
       // Fermer la popup de victoire
       victoryPopup.classList.remove('active');
       
-      // Charger la sauvegarde si elle existe
-      loadGame();
+      // Charger la sauvegarde UNIQUEMENT si demandé explicitement
+      if (loadSave) {
+        loadGame();
+      }
     }
     
-    // Changer le niveau de difficulté
+    // Changer le niveau de difficulté - NOUVELLE VERSION
     function setDifficulty(difficulty) {
       currentDifficulty = difficulty;
       lockHP = difficultySettings[difficulty].lockHP;
@@ -1751,8 +1753,8 @@
       });
       document.getElementById(`difficulty${difficulty.charAt(0).toUpperCase() + difficulty.slice(1)}`).classList.add('active');
       
-      // Réinitialiser le jeu avec la nouvelle difficulté
-      initGame();
+      // Réinitialiser le jeu avec la nouvelle difficulté SANS charger la sauvegarde
+      initGame(false);
     }
     
     // Mettre à jour l'interface utilisateur
@@ -1848,7 +1850,7 @@
         showJackpotPopup();
         message.textContent = `INCROYABLE ! Vous avez gagné le jackpot de ${jackpotAmount} pièces !`;
         
-        // Réinitialiser le jackpot
+        // Réinitialiser le jackpot SEULEMENT en cas de gain
         jackpotAmount = 1000; // Remettre le jackpot à 1000 pièces
         updateUI();
       }
@@ -2136,13 +2138,13 @@
     
     // Événements
     attackBtn.addEventListener('click', attack);
-    resetBtn.addEventListener('click', initGame);
+    resetBtn.addEventListener('click', () => initGame(false));
     saveBtn.addEventListener('click', saveGame);
     closePopupBtn.addEventListener('click', () => {
       victoryPopup.classList.remove('active');
     });
 
-    // CORRECTION : Événements pour les niveaux de difficulté - avec les bonnes majuscules
+    // Événements pour les niveaux de difficulté
     document.getElementById("difficultyEasy").addEventListener("click", () => setDifficulty('easy'));
     document.getElementById("difficultyMedium").addEventListener("click", () => setDifficulty('medium'));
     document.getElementById("difficultyHard").addEventListener("click", () => setDifficulty('hard'));
@@ -2178,7 +2180,7 @@
         e.preventDefault();
         attack();
       } else if (e.key === 'r' || e.key === 'R') {
-        initGame();
+        initGame(false);
       } else if (e.key === 's' || e.key === 'S') {
         saveGame();
       } else if (e.key === '1') {
@@ -2211,7 +2213,7 @@
     
     // Initialiser le jeu au chargement
     window.addEventListener('load', () => {
-      initGame();
+      initGame(true); // Charger la sauvegarde au démarrage
       playMusic();
     });
   </script>
