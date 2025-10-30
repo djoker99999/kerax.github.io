@@ -978,7 +978,7 @@
       }
     }
 
-    /* NOUVEAU : Styles pour le compteur de combo */
+    /* Styles pour le compteur de combo */
     .combo-counter {
       position: fixed;
       top: 20px;
@@ -1232,7 +1232,7 @@
   </style>
 </head>
 <body>
-  <!-- NOUVEAU : Compteur de combo -->
+  <!-- Compteur de combo -->
   <div class="combo-counter" id="comboCounter">
     <div class="combo-count" id="comboCount">0</div>
     <div class="combo-label">COMBO</div>
@@ -1362,7 +1362,7 @@
 
     <p id="message">Choisis un niveau de difficulté et clique sur "Attaquer" !</p>
     
-    <!-- NOUVEAU : Panneau des derniers gains -->
+    <!-- Panneau des derniers gains -->
     <div class="recent-rewards-container">
       <div class="recent-rewards-title">🎯 Derniers Gains Obtenus</div>
       <div class="recent-rewards-list" id="recentRewardsList">
@@ -1437,13 +1437,13 @@
     let jackpotAmount = 1000; // Jackpot de départ à 1000 pièces
     let hitsSinceLastJackpot = 0;
     const jackpotInterval = 500; // Tous les 500 coups
-    const jackpotChance = 1000000; // CORRECTION: 1 chance sur 1 million (au lieu de 100000)
+    const jackpotChance = 1000000; // 1 chance sur 1 million
     
-    // NOUVEAU : Historique des gains récents
+    // Historique des gains récents
     let recentRewards = [];
     const maxRecentRewards = 10; // Maximum de gains à afficher
     
-    // NOUVEAU : Variables pour le système de combo
+    // Variables pour le système de combo
     let comboCount = 0;
     let comboTimeout = null;
     const comboDuration = 3000; // 3 secondes pour maintenir le combo
@@ -1475,7 +1475,7 @@
     const jackpotAmountDisplay = document.getElementById('jackpotAmount');
     const recentRewardsList = document.getElementById('recentRewardsList');
     
-    // NOUVEAU : Éléments pour le système de combo
+    // Éléments pour le système de combo
     const comboCounter = document.getElementById('comboCounter');
     const comboCountDisplay = document.getElementById('comboCount');
     
@@ -1529,7 +1529,7 @@
       }
     };
     
-    // NOUVEAU : Gestion du système de combo
+    // Gestion du système de combo
     function updateCombo() {
       const currentTime = Date.now();
       
@@ -1562,7 +1562,7 @@
       }, comboDuration);
     }
     
-    // NOUVEAU : Afficher un popup de combo
+    // Afficher un popup de combo
     function showComboPopup() {
       const comboPopup = document.createElement('div');
       comboPopup.className = 'combo-popup';
@@ -1584,7 +1584,7 @@
       }, 1500);
     }
     
-    // NOUVEAU : Ajouter un gain à l'historique
+    // Ajouter un gain à l'historique
     function addRecentReward(type, amount) {
       // Ne pas ajouter les contributions au jackpot dans l'historique
       if (type === 'jackpot_contribution') return;
@@ -1613,7 +1613,7 @@
       updateRecentRewardsDisplay();
     }
     
-    // NOUVEAU : Mettre à jour l'affichage des gains récents
+    // Mettre à jour l'affichage des gains récents
     function updateRecentRewardsDisplay() {
       if (recentRewards.length === 0) {
         recentRewardsList.innerHTML = `
@@ -1635,7 +1635,7 @@
       `).join('');
     }
     
-    // NOUVEAU : Obtenir le texte du type de récompense
+    // Obtenir le texte du type de récompense
     function getRewardTypeText(type) {
       const types = {
         'lock': '🔓 Cadena cassé',
@@ -1722,7 +1722,7 @@
       magicChest.classList.remove('low-hp');
       magicChest.classList.remove('shaking');
       
-      // NOUVEAU : Réinitialiser le combo
+      // Réinitialiser le combo
       comboCount = 0;
       comboCounter.classList.remove('active');
       clearTimeout(comboTimeout);
@@ -1838,7 +1838,7 @@
         updateUI();
       }
       
-      // CORRECTION: Vérifier si le joueur gagne le jackpot (1 chance sur 1 million par coup)
+      // Vérifier si le joueur gagne le jackpot (1 chance sur 1 million par coup)
       if (Math.random() < attackPower / jackpotChance) {
         coins += jackpotAmount;
         
@@ -1861,7 +1861,7 @@
       isAttacking = true;
       let damageDealt = 0;
       
-      // NOUVEAU : Mettre à jour le combo
+      // Mettre à jour le combo
       updateCombo();
       
       // Animation du coffre qui bouge (TOUJOURS)
@@ -2023,8 +2023,8 @@
         jackpotAmount: jackpotAmount,
         hitsSinceLastJackpot: hitsSinceLastJackpot,
         recentRewards: recentRewards, // Sauvegarder l'historique des gains
-        comboCount: comboCount, // NOUVEAU : Sauvegarder le combo
-        lastAttackTime: lastAttackTime // NOUVEAU : Sauvegarder le temps de la dernière attaque
+        comboCount: comboCount, // Sauvegarder le combo
+        lastAttackTime: lastAttackTime // Sauvegarder le temps de la dernière attaque
       };
       
       localStorage.setItem('magicChestGame', JSON.stringify(gameState));
@@ -2052,7 +2052,7 @@
           hitsSinceLastJackpot = gameState.hitsSinceLastJackpot || hitsSinceLastJackpot;
           recentRewards = gameState.recentRewards || recentRewards; // Charger l'historique
           
-          // NOUVEAU : Charger les données du combo
+          // Charger les données du combo
           comboCount = gameState.comboCount || 0;
           lastAttackTime = gameState.lastAttackTime || 0;
           
@@ -2084,7 +2084,7 @@
           });
           document.getElementById(`mode${attackPower}`).classList.add('active');
           
-          // NOUVEAU : Mettre à jour l'affichage du combo
+          // Mettre à jour l'affichage du combo
           if (comboCount > 0 && Date.now() - lastAttackTime < comboDuration) {
             comboCountDisplay.textContent = comboCount;
             comboCounter.classList.add('active');
@@ -2142,7 +2142,7 @@
       victoryPopup.classList.remove('active');
     });
 
-    // CORRECTION: Événements pour les niveaux de difficulté - utilisation des bonnes majuscules
+    // CORRECTION : Événements pour les niveaux de difficulté - avec les bonnes majuscules
     document.getElementById("difficultyEasy").addEventListener("click", () => setDifficulty('easy'));
     document.getElementById("difficultyMedium").addEventListener("click", () => setDifficulty('medium'));
     document.getElementById("difficultyHard").addEventListener("click", () => setDifficulty('hard'));
