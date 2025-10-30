@@ -102,14 +102,14 @@
     .difficulty-levels {
       display: flex;
       justify-content: center;
-      gap: 15px;
-      margin: 20px 0;
+      gap: 10px;
+      margin: 15px 0;
       flex-wrap: wrap;
     }
 
     .difficulty-level {
-      width: 120px;
-      height: 120px;
+      width: 110px;
+      height: 110px;
       cursor: pointer;
       border: 2px solid rgba(255, 255, 255, 0.3);
       border-radius: 15px;
@@ -120,8 +120,9 @@
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      padding: 10px;
+      padding: 8px;
       position: relative;
+      animation: buttonFloat 3s ease-in-out infinite;
     }
 
     .difficulty-level:hover {
@@ -137,14 +138,14 @@
     }
 
     .difficulty-level img {
-      width: 65px;
-      height: 65px;
+      width: 55px;
+      height: 55px;
       object-fit: contain;
       filter: drop-shadow(0 0 5px rgba(255, 255, 255, 0.5));
     }
 
     .difficulty-label {
-      font-size: 13px;
+      font-size: 12px;
       margin-top: 5px;
       font-weight: bold;
       color: #feca57;
@@ -152,27 +153,27 @@
     }
 
     .difficulty-reward {
-      font-size: 11px;
+      font-size: 10px;
       color: #ffd700;
       margin-top: 3px;
     }
 
     .chest-container {
       position: relative;
-      margin: 20px auto;
+      margin: 15px auto;
       display: flex;
       justify-content: center;
       align-items: center;
       width: 100%;
-      min-height: 500px;
+      min-height: 400px;
       perspective: 1000px;
       gap: 15px;
       flex-wrap: wrap;
     }
 
     .magic-chest {
-      width: 500px;
-      height: 300px;
+      width: 450px;
+      height: 270px;
       margin: 0 auto;
       background-image: url('https://i.ibb.co/ZzzWFhC4/coffre.png');
       background-size: contain;
@@ -184,9 +185,19 @@
       z-index: 5;
     }
 
+    .magic-chest.low-hp {
+      filter: drop-shadow(0 0 20px rgba(255, 0, 0, 0.8)) brightness(1.3) contrast(1.2) hue-rotate(-30deg);
+      animation: chestPulse 1s ease-in-out infinite;
+    }
+
+    @keyframes chestPulse {
+      0%, 100% { filter: drop-shadow(0 0 20px rgba(255, 0, 0, 0.8)) brightness(1.3) contrast(1.2) hue-rotate(-30deg); }
+      50% { filter: drop-shadow(0 0 30px rgba(255, 0, 0, 1)) brightness(1.5) contrast(1.3) hue-rotate(-40deg); }
+    }
+
     .locks-container {
       position: absolute;
-      top: -60px;
+      top: -50px;
       left: 0;
       width: 100%;
       display: flex;
@@ -195,8 +206,8 @@
     }
 
     .lock {
-      width: 100px;
-      height: 100px;
+      width: 90px;
+      height: 90px;
       display: flex;
       justify-content: center;
       align-items: center;
@@ -209,8 +220,8 @@
     }
 
     .lock-image {
-      width: 90px;
-      height: 90px;
+      width: 80px;
+      height: 80px;
       background-image: url('https://i.ibb.co/20XRf3Q3/cadena.png');
       background-size: contain;
       background-repeat: no-repeat;
@@ -329,20 +340,40 @@
       }
     }
 
+    /* Nouveau rectangle transparent au-dessus des boutons de coups */
+    .attack-header {
+      background: rgba(255, 255, 255, 0.15);
+      border-radius: 12px;
+      padding: 12px 20px;
+      margin: 10px auto 15px;
+      max-width: 600px;
+      backdrop-filter: blur(8px);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    }
+
+    .attack-header p {
+      font-size: 1.1em;
+      font-weight: bold;
+      color: #fff;
+      text-shadow: 0 0 8px rgba(255, 215, 0, 0.7);
+      margin: 0;
+    }
+
     .attack-modes {
       display: flex;
       justify-content: center;
-      gap: 12px;
-      margin: 15px 0;
+      gap: 8px;
+      margin: 10px 0;
       flex-wrap: wrap;
     }
 
     .attack-mode-image {
-      width: 110px;
-      height: 110px;
+      width: 95px;
+      height: 95px;
       cursor: pointer;
       border: 2px solid rgba(255, 255, 255, 0.3);
-      border-radius: 15px;
+      border-radius: 12px;
       background: rgba(255, 255, 255, 0.1);
       transition: all 0.3s ease;
       backdrop-filter: blur(5px);
@@ -350,8 +381,9 @@
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      padding: 10px;
+      padding: 8px;
       position: relative;
+      animation: buttonFloat 3s ease-in-out infinite;
     }
 
     .attack-mode-image:hover {
@@ -367,18 +399,23 @@
     }
 
     .attack-mode-image img {
-      width: 65px;
-      height: 65px;
+      width: 50px;
+      height: 50px;
       object-fit: contain;
       filter: drop-shadow(0 0 5px rgba(255, 255, 255, 0.5));
     }
 
     .attack-mode-label {
-      font-size: 13px;
+      font-size: 11px;
       margin-top: 5px;
       font-weight: bold;
       color: #feca57;
       text-shadow: 0 0 3px rgba(0, 0, 0, 0.8);
+    }
+
+    @keyframes buttonFloat {
+      0%, 100% { transform: translateY(0) scale(1); }
+      50% { transform: translateY(-5px) scale(1.02); }
     }
 
     .hammer {
@@ -402,9 +439,11 @@
     }
 
     @keyframes hammerHit {
-      0% { transform: rotate(0deg) translateY(0); }
-      50% { transform: rotate(-45deg) translateY(15px); }
-      100% { transform: rotate(0deg) translateY(0); }
+      0% { transform: rotate(0deg) translateY(0) translateX(0); }
+      25% { transform: rotate(-45deg) translateY(15px) translateX(-10px); }
+      50% { transform: rotate(-90deg) translateY(30px) translateX(-20px); }
+      75% { transform: rotate(-45deg) translateY(15px) translateX(-10px); }
+      100% { transform: rotate(0deg) translateY(0) translateX(0); }
     }
 
     .controls {
@@ -427,6 +466,7 @@
       text-transform: uppercase;
       font-weight: bold;
       letter-spacing: 1px;
+      animation: buttonFloat 3s ease-in-out infinite;
     }
 
     button:hover {
@@ -459,10 +499,10 @@
     .stats {
       display: flex;
       justify-content: space-around;
-      margin: 20px 0;
+      margin: 15px 0;
       background: rgba(255, 255, 255, 0.1);
-      padding: 15px;
-      border-radius: 15px;
+      padding: 12px;
+      border-radius: 12px;
     }
 
     .stat {
@@ -472,13 +512,13 @@
     }
 
     .stat-value {
-      font-size: 1.8em;
+      font-size: 1.6em;
       font-weight: bold;
       color: #ffd700;
     }
 
     .stat-label {
-      font-size: 0.9em;
+      font-size: 0.85em;
       color: #daa520;
     }
 
@@ -690,22 +730,22 @@
 
     /* Nouveaux styles pour le jackpot et le tableau des gains */
     .jackpot-container {
-      margin: 15px 0;
-      padding: 15px;
+      margin: 10px 0;
+      padding: 12px;
       background: rgba(255, 215, 0, 0.1);
-      border-radius: 15px;
+      border-radius: 12px;
       border: 2px solid rgba(255, 215, 0, 0.3);
     }
 
     .jackpot-title {
-      font-size: 1.2em;
+      font-size: 1.1em;
       color: #ffd700;
-      margin-bottom: 10px;
+      margin-bottom: 8px;
       text-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
     }
 
     .jackpot-amount {
-      font-size: 2em;
+      font-size: 1.8em;
       font-weight: bold;
       color: #ffd700;
       text-shadow: 0 0 15px rgba(255, 215, 0, 0.8);
@@ -718,29 +758,30 @@
     }
 
     .jackpot-info {
-      font-size: 0.9em;
+      font-size: 0.85em;
       color: #daa520;
       margin-top: 5px;
     }
 
     .rewards-table-container {
-      max-height: 300px;
+      max-height: 250px;
       overflow-y: auto;
-      margin: 20px 0;
+      margin: 15px 0;
       background: rgba(255, 255, 255, 0.1);
-      border-radius: 15px;
-      padding: 15px;
+      border-radius: 12px;
+      padding: 12px;
       border: 2px solid rgba(255, 215, 0, 0.3);
     }
 
     .rewards-table {
       width: 100%;
       border-collapse: collapse;
+      font-size: 0.9em;
     }
 
     .rewards-table th {
       background: rgba(218, 165, 32, 0.3);
-      padding: 12px;
+      padding: 10px;
       text-align: left;
       color: #ffd700;
       position: sticky;
@@ -748,7 +789,7 @@
     }
 
     .rewards-table td {
-      padding: 10px;
+      padding: 8px;
       border-bottom: 1px solid rgba(255, 255, 255, 0.1);
     }
 
@@ -816,9 +857,117 @@
       100% { transform: rotate(360deg) scale(1); }
     }
 
+    /* Nouveaux styles pour l'affichage des dégâts */
+    .damage-popup {
+      position: absolute;
+      font-size: 24px;
+      font-weight: bold;
+      color: #ff4444;
+      text-shadow: 0 0 10px rgba(255, 0, 0, 0.7);
+      pointer-events: none;
+      z-index: 100;
+      animation: damageFloat 1.5s ease-out forwards;
+      white-space: nowrap;
+    }
+
+    @keyframes damageFloat {
+      0% {
+        opacity: 0;
+        transform: translateY(0) scale(0.5);
+      }
+      20% {
+        opacity: 1;
+        transform: translateY(-20px) scale(1.2);
+      }
+      40% {
+        opacity: 1;
+        transform: translateY(-40px) scale(1.1);
+      }
+      60% {
+        opacity: 1;
+        transform: translateY(-60px) scale(1);
+      }
+      80% {
+        opacity: 0.7;
+        transform: translateY(-80px) scale(0.9);
+      }
+      100% {
+        opacity: 0;
+        transform: translateY(-100px) scale(0.8);
+      }
+    }
+
+    .critical-damage {
+      color: #ffaa00;
+      font-size: 28px;
+      text-shadow: 0 0 15px rgba(255, 170, 0, 0.9);
+      animation: criticalDamage 1.8s ease-out forwards;
+    }
+
+    @keyframes criticalDamage {
+      0% {
+        opacity: 0;
+        transform: translateY(0) scale(0.5) rotate(-10deg);
+      }
+      20% {
+        opacity: 1;
+        transform: translateY(-25px) scale(1.4) rotate(5deg);
+      }
+      40% {
+        opacity: 1;
+        transform: translateY(-50px) scale(1.3) rotate(-3deg);
+      }
+      60% {
+        opacity: 1;
+        transform: translateY(-75px) scale(1.2) rotate(2deg);
+      }
+      80% {
+        opacity: 0.7;
+        transform: translateY(-100px) scale(1.1) rotate(-1deg);
+      }
+      100% {
+        opacity: 0;
+        transform: translateY(-120px) scale(1) rotate(0deg);
+      }
+    }
+
+    .mega-damage {
+      color: #ff00ff;
+      font-size: 32px;
+      text-shadow: 0 0 20px rgba(255, 0, 255, 1);
+      animation: megaDamage 2s ease-out forwards;
+    }
+
+    @keyframes megaDamage {
+      0% {
+        opacity: 0;
+        transform: translateY(0) scale(0.3);
+      }
+      20% {
+        opacity: 1;
+        transform: translateY(-30px) scale(1.6) rotate(10deg);
+      }
+      40% {
+        opacity: 1;
+        transform: translateY(-60px) scale(1.5) rotate(-8deg);
+      }
+      60% {
+        opacity: 1;
+        transform: translateY(-90px) scale(1.4) rotate(6deg);
+      }
+      80% {
+        opacity: 0.7;
+        transform: translateY(-120px) scale(1.3) rotate(-4deg);
+      }
+      100% {
+        opacity: 0;
+        transform: translateY(-150px) scale(1.2) rotate(0deg);
+      }
+    }
+
     @media (min-width: 768px) {
       .game-container {
-        padding: 30px;
+        padding: 25px;
         max-width: 900px;
       }
       
@@ -827,8 +976,8 @@
       }
       
       .magic-chest {
-        width: 600px;
-        height: 350px;
+        width: 550px;
+        height: 330px;
       }
       
       .hammer {
@@ -859,42 +1008,59 @@
     }
 
     @media (max-width: 480px) {
+      .game-container {
+        padding: 15px;
+      }
+      
+      h1 {
+        font-size: 1.5em;
+      }
+      
+      .attack-header {
+        padding: 10px 15px;
+        margin: 8px auto 12px;
+      }
+      
+      .attack-header p {
+        font-size: 1em;
+      }
+
       .attack-modes {
         gap: 5px;
         padding: 0 5px;
       }
 
       .attack-mode-image {
-        width: 85px;
-        height: 85px;
+        width: 75px;
+        height: 75px;
       }
 
       .attack-mode-image img {
-        width: 50px;
-        height: 50px;
+        width: 40px;
+        height: 40px;
       }
 
       .attack-mode-label {
-        font-size: 11px;
+        font-size: 10px;
       }
 
       .magic-chest {
-        width: 350px;
-        height: 200px;
+        width: 300px;
+        height: 180px;
       }
       
       .lock {
-        width: 80px;
-        height: 80px;
-      }
-      
-      .lock-image {
         width: 70px;
         height: 70px;
       }
       
+      .lock-image {
+        width: 60px;
+        height: 60px;
+      }
+      
       .locks-container {
-        top: -50px;
+        top: -40px;
       }
       
       .sound-menu {
@@ -915,6 +1081,40 @@
       .jackpot-popup {
         font-size: 20px;
         padding: 20px;
+      }
+      
+      .damage-popup {
+        font-size: 18px;
+      }
+      
+      .critical-damage {
+        font-size: 22px;
+      }
+      
+      .mega-damage {
+        font-size: 26px;
+      }
+      
+      .difficulty-levels {
+        gap: 8px;
+      }
+      
+      .difficulty-level {
+        width: 90px;
+        height: 90px;
+      }
+      
+      .difficulty-level img {
+        width: 45px;
+        height: 45px;
+      }
+      
+      .difficulty-label {
+        font-size: 10px;
+      }
+      
+      .difficulty-reward {
+        font-size: 9px;
       }
     }
   </style>
@@ -967,7 +1167,7 @@
     
     <div class="jackpot-container">
       <div class="jackpot-title">JACKPOT</div>
-      <div class="jackpot-amount" id="jackpotAmount">0 pièces</div>
+      <div class="jackpot-amount" id="jackpotAmount">1000 pièces</div>
       <div class="jackpot-info" id="jackpotInfo">Tous les 500 coups, 1 pièce est ajoutée au jackpot</div>
     </div>
     
@@ -1004,6 +1204,11 @@
       
       <div class="magic-chest" id="magicChest"></div>
       <div class="hammer" id="hammer"></div>
+    </div>
+
+    <!-- Nouveau rectangle transparent au-dessus des boutons de coups -->
+    <div class="attack-header">
+      <p>💎 Casse le coffre et gagne la récompense 💎</p>
     </div>
 
     <div class="attack-modes">
@@ -1146,7 +1351,7 @@
     let soundEnabled = true;
     
     // Variables pour le jackpot
-    let jackpotAmount = 0;
+    let jackpotAmount = 1000; // Jackpot de départ à 1000 pièces
     let hitsSinceLastJackpot = 0;
     const jackpotInterval = 500; // Tous les 500 coups
     const jackpotChance = 100000; // 1 chance sur 100000
@@ -1188,6 +1393,13 @@
     const attack1000Sound = document.getElementById('attack1000Sound');
     const jackpotSound = document.getElementById('jackpotSound');
     
+    // Contrôles de volume
+    const masterVolumeSlider = document.getElementById('masterVolume');
+    const effectsVolumeSlider = document.getElementById('effectsVolume');
+    const musicVolumeSlider = document.getElementById('musicVolume');
+    const soundToggle = document.getElementById('soundToggle');
+    const soundControls = document.getElementById('soundControls');
+    
     // Configuration des niveaux de difficulté
     const difficultySettings = {
       easy: {
@@ -1220,6 +1432,52 @@
       }
     };
     
+    // Afficher les dégâts en superposition
+    function showDamagePopup(damage, isCritical = false, isMega = false) {
+      const damagePopup = document.createElement('div');
+      damagePopup.className = 'damage-popup';
+      
+      if (isMega) {
+        damagePopup.classList.add('mega-damage');
+        damagePopup.textContent = `-${damage} HP !!!`;
+      } else if (isCritical) {
+        damagePopup.classList.add('critical-damage');
+        damagePopup.textContent = `-${damage} HP !!`;
+      } else {
+        damagePopup.textContent = `-${damage} HP`;
+      }
+      
+      // Position aléatoire sur le coffre
+      const chestRect = magicChest.getBoundingClientRect();
+      const x = Math.random() * (chestRect.width - 100) + 50;
+      const y = Math.random() * (chestRect.height - 50) + 25;
+      
+      damagePopup.style.left = `${x}px`;
+      damagePopup.style.top = `${y}px`;
+      
+      magicChest.appendChild(damagePopup);
+      
+      // Supprimer l'élément après l'animation
+      setTimeout(() => {
+        damagePopup.remove();
+      }, 2000);
+    }
+    
+    // Vérifier si le coffre doit devenir rouge
+    function checkChestState() {
+      const activeLocks = locks.filter(lock => lock.hp > 0);
+      const totalRemainingHP = activeLocks.reduce((sum, lock) => sum + lock.hp, 0);
+      const maxTotalHP = difficultySettings[currentDifficulty].lockHP * maxLocks;
+      const hpPercentage = totalRemainingHP / maxTotalHP;
+      
+      // Si il ne reste qu'un seul cadena et qu'il a moins de 20% de vie
+      if (activeLocks.length === 1 && hpPercentage < 0.2) {
+        magicChest.classList.add('low-hp');
+      } else {
+        magicChest.classList.remove('low-hp');
+      }
+    }
+    
     // Initialisation du jeu
     function initGame() {
       attackPower = 1;
@@ -1238,6 +1496,9 @@
         btn.classList.remove('active');
       });
       document.getElementById('mode1').classList.add('active');
+      
+      // Réinitialiser l'état du coffre
+      magicChest.classList.remove('low-hp');
       
       // Mettre à jour l'affichage
       updateUI();
@@ -1358,7 +1619,7 @@
         message.textContent = `INCROYABLE ! Vous avez gagné le jackpot de ${jackpotAmount} pièces !`;
         
         // Réinitialiser le jackpot
-        jackpotAmount = 0;
+        jackpotAmount = 1000; // Remettre le jackpot à 1000 pièces
         updateUI();
       }
     }
@@ -1391,6 +1652,13 @@
       
       // Gérer le système de jackpot
       handleJackpot();
+      
+      // Afficher les dégâts totaux en superposition
+      if (attackPower > 1) {
+        const isCritical = attackPower >= 100;
+        const isMega = attackPower >= 500;
+        showDamagePopup(attackPower, isCritical, isMega);
+      }
       
       // Trouver un cadena non cassé au hasard (UNE SEULE FOIS pour tous les coups)
       const activeLocks = locks.filter(lock => lock.hp > 0);
@@ -1439,6 +1707,9 @@
           }
         }
       }
+      
+      // Vérifier l'état du coffre
+      checkChestState();
       
       // Mettre à jour l'interface
       updateUI();
@@ -1557,6 +1828,9 @@
               }
             });
           }
+          
+          // Vérifier l'état du coffre
+          checkChestState();
           
           // Mettre à jour le mode d'attaque
           document.querySelectorAll('.attack-mode-image').forEach(btn => {
