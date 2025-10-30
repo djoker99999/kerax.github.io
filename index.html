@@ -429,20 +429,22 @@
       50% { transform: translateY(-5px) scale(1.02); }
     }
 
+    /* Nouveau marteau animé */
     .hammer {
       position: absolute;
-      width: 60px;
-      height: 60px;
-      background-image: url('https://i.ibb.co/Jj5jn3ms/marteau.png');
+      width: 100px;
+      height: 100px;
+      background-image: url('https://i.gifer.com/ZSj8.gif');
       background-size: contain;
       background-repeat: no-repeat;
       background-position: center;
       z-index: 10;
-      top: -30px;
-      right: -15px;
+      top: -50px;
+      right: -30px;
       transform-origin: bottom center;
       transition: transform 0.3s ease;
       pointer-events: none;
+      filter: drop-shadow(0 0 10px rgba(255, 215, 0, 0.7));
     }
 
     .hammer.hitting {
@@ -992,10 +994,10 @@
       }
       
       .hammer {
-        width: 80px;
-        height: 80px;
-        top: -40px;
-        right: -20px;
+        width: 120px;
+        height: 120px;
+        top: -60px;
+        right: -40px;
       }
       
       .controls {
@@ -1072,6 +1074,13 @@
       
       .locks-container {
         top: -40px;
+      }
+      
+      .hammer {
+        width: 80px;
+        height: 80px;
+        top: -40px;
+        right: -20px;
       }
       
       .sound-menu {
