@@ -1366,7 +1366,7 @@
     </div>
 
     <div class="attack-header">
-      <p>💎 Casse le coffre et gagne la récompense 💎</p>
+      <p>💎 Casse les cadenas puis le coffre pour gagner la récompense 💎</p>
     </div>
 
     <div class="attack-modes">
@@ -1424,7 +1424,7 @@
     <div class="popup-content">
       <h3>🎉 Félicitations ! 🎉</h3>
       <div class="popup-reward-image" id="popupRewardImage"></div>
-      <p class="popup-reward-text">Vous avez cassé tous les cadenas !</p>
+      <p class="popup-reward-text">Vous avez cassé le coffre !</p>
       <div class="popup-victory-message" id="popupVictoryMessage">+1000 pièces bonus !</div>
       <button class="popup-close-btn" id="closePopupBtn">Continuer</button>
     </div>
@@ -1471,6 +1471,7 @@
     let totalHits = 0;
     const maxLocks = 4;
     let lockHP = 1300; // Base HP pour le niveau facile
+    let chestHP = 1000; // Points de vie du coffre
     let isAttacking = false;
     let currentDifficulty = 'easy';
     
@@ -1486,9 +1487,9 @@
     const jackpotInterval = 500; // Tous les 500 coups
     const jackpotChance = 1000000000; // 1 chance sur 1 milliard
     
-    // Variables pour le pool de drop - MODIFICATIONS ICI
+    // Variables pour le pool de drop
     let poolAmount = 0;
-    const poolDropChance = 50000; // MODIFICATION: 1 chance sur 50 000 (au lieu de 1 million)
+    const poolDropChance = 50000; // 1 chance sur 50 000
     const poolMinAmount = 10; // Minimum 10 pièces dans le pool pour pouvoir drop
     const poolMaxAmount = 30000; // Maximum 30000 pièces dans le pool
     
@@ -1559,6 +1560,7 @@
       easy: {
         name: 'Facile',
         lockHP: 1300,
+        chestHP: 1000,
         rewardPerLock: 100,
         bonusReward: 1000,
         image: 'https://i.ibb.co/2fBDM0x/IMG-6230-Photoroom.png'
@@ -1566,6 +1568,7 @@
       medium: {
         name: 'Moyen',
         lockHP: 3900, // 3x plus de vie
+        chestHP: 3000, // 3x plus de vie pour le coffre
         rewardPerLock: 300,
         bonusReward: 3000,
         image: 'https://i.ibb.co/xKjwCQ4X/IMG-7355-Photoroom.png'
@@ -1573,6 +1576,7 @@
       hard: {
         name: 'Difficile',
         lockHP: 6500, // 5x plus de vie
+        chestHP: 5000, // 5x plus de vie pour le coffre
         rewardPerLock: 500,
         bonusReward: 5000,
         image: 'https://i.ibb.co/gbvXGqHj/IMG-7356-Photoroom.png'
@@ -1580,11 +1584,25 @@
       extreme: {
         name: 'Extrême',
         lockHP: 40000, // 40 000 HP pour le niveau extrême
+        chestHP: 30000, // 30 000 HP pour le coffre
         rewardPerLock: 1000, // 1000 pièces par cadena
         bonusReward: 30000, // 30 000 pièces bonus
         image: 'https://i.ibb.co/N6ZGGZ93/extreme.png'
       }
     };
+    
+    // Vérifier si le coffre doit devenir rouge
+    function checkChestState() {
+      const maxChestHP = difficultySettings[currentDifficulty].chestHP;
+      const hpPercentage = chestHP / maxChestHP;
+      
+      // Si le coffre a moins de 20% de vie
+      if (hpPercentage < 0.2) {
+        magicChest.classList.add('low-hp');
+      } else {
+        magicChest.classList.remove('low-hp');
+      }
+    }
     
     // Gestion du système de combo
     function updateCombo() {
@@ -1698,7 +1716,8 @@
         'lock': '🔓 Cadena cassé',
         'bonus': '🎉 Bonus de victoire',
         'jackpot': '💰 JACKPOT',
-        'pool': '💧 Pool de drop'
+        'pool': '💧 Pool de drop',
+        'chest': '🏆 Coffre cassé'
       };
       return types[type] || type;
     }
@@ -1742,21 +1761,6 @@
       }, 300);
     }
     
-    // Vérifier si le coffre doit devenir rouge
-    function checkChestState() {
-      const activeLocks = locks.filter(lock => lock.hp > 0);
-      const totalRemainingHP = activeLocks.reduce((sum, lock) => sum + lock.hp, 0);
-      const maxTotalHP = difficultySettings[currentDifficulty].lockHP * maxLocks;
-      const hpPercentage = totalRemainingHP / maxTotalHP;
-      
-      // Si il ne reste qu'un seul cadena et qu'il a moins de 20% de vie
-      if (activeLocks.length === 1 && hpPercentage < 0.2) {
-        magicChest.classList.add('low-hp');
-      } else {
-        magicChest.classList.remove('low-hp');
-      }
-    }
-    
     // Initialisation du jeu
     function initGame(loadSave = false) {
       attackPower = 1;
@@ -1769,6 +1773,9 @@
         lock.element = document.getElementById(lock.id);
         lock.element.classList.remove('broken');
       });
+      
+      // Réinitialiser le coffre
+      chestHP = difficultySettings[currentDifficulty].chestHP;
       
       // Réinitialiser les modes d'attaque
       document.querySelectorAll('.attack-mode-image').forEach(btn => {
@@ -1804,6 +1811,7 @@
     function setDifficulty(difficulty) {
       currentDifficulty = difficulty;
       lockHP = difficultySettings[difficulty].lockHP;
+      chestHP = difficultySettings[difficulty].chestHP;
       
       // Mettre à jour l'affichage des niveaux
       document.querySelectorAll('.difficulty-level').forEach(btn => {
@@ -1915,14 +1923,14 @@
       }
     }
     
-    // Gérer le système de pool de drop - MODIFICATIONS ICI
+    // Gérer le système de pool de drop
     function handlePoolDrop() {
-      // MODIFICATION: Ajouter 0.02 pièce au pool pour chaque coup (au lieu de 0.05)
+      // Ajouter 0.02 pièce au pool pour chaque coup
       poolAmount += 0.02 * attackPower;
       
       // Vérifier si le pool peut drop (entre 10 et 30000 pièces)
       if (poolAmount >= poolMinAmount && poolAmount <= poolMaxAmount) {
-        // MODIFICATION: Vérifier si le joueur gagne le drop (1 chance sur 50 000 par coup)
+        // Vérifier si le joueur gagne le drop (1 chance sur 50 000 par coup)
         if (Math.random() < attackPower / poolDropChance) {
           const dropAmount = Math.floor(poolAmount);
           coins += dropAmount;
@@ -1937,9 +1945,6 @@
           // Réinitialiser le pool
           poolAmount = 0;
           updateUI();
-          
-          // MODIFICATION: Le jeu continue normalement, pas de cassage de cadena
-          // On ne fait rien de plus ici, l'attaque continue normalement
         }
       }
     }
@@ -1964,9 +1969,9 @@
       }, 2000);
     }
     
-    // Attaquer les cadenas
+    // Attaquer les cadenas ou le coffre
     function attack() {
-      if (locksBroken >= maxLocks || isAttacking) return;
+      if (isAttacking) return;
       
       isAttacking = true;
       let damageDealt = 0;
@@ -2004,65 +2009,89 @@
         showDamagePopup(attackPower, isCritical, isMega);
       }
       
-      // Trouver un cadena non cassé au hasard (UNE SEULE FOIS pour tous les coups)
-      const activeLocks = locks.filter(lock => lock.hp > 0);
-      if (activeLocks.length === 0) {
-        isAttacking = false;
-        return;
-      }
-      
-      const targetLock = activeLocks[Math.floor(Math.random() * activeLocks.length)];
-      
-      // Effectuer tous les coups sur le MÊME cadena
-      for (let i = 0; i < attackPower; i++) {
-        // Vérifier si le cadena cible est toujours actif
-        if (targetLock.hp <= 0) break;
+      // Si tous les cadenas ne sont pas encore cassés, attaquer les cadenas
+      if (locksBroken < maxLocks) {
+        // Trouver un cadena non cassé au hasard (UNE SEULE FOIS pour tous les coups)
+        const activeLocks = locks.filter(lock => lock.hp > 0);
+        if (activeLocks.length === 0) {
+          isAttacking = false;
+          return;
+        }
         
-        // Appliquer des dégâts
-        targetLock.hp -= 1;
-        damageDealt += 1;
-        totalHits += 1;
+        const targetLock = activeLocks[Math.floor(Math.random() * activeLocks.length)];
         
-        // Vérifier si le cadena est cassé
-        if (targetLock.hp <= 0) {
-          targetLock.element.classList.add('broken');
-          locksBroken++;
+        // Effectuer tous les coups sur le MÊME cadena
+        for (let i = 0; i < attackPower; i++) {
+          // Vérifier si le cadena cible est toujours actif
+          if (targetLock.hp <= 0) break;
           
-          // Jouer le son de cassage de cadena
-          playSound(lockBreakSound);
+          // Appliquer des dégâts
+          targetLock.hp -= 1;
+          damageDealt += 1;
+          totalHits += 1;
           
-          // Gagner des pièces pour chaque cadena cassé
-          const rewardAmount = difficultySettings[currentDifficulty].rewardPerLock;
-          coins += rewardAmount;
+          // Vérifier si le cadena est cassé
+          if (targetLock.hp <= 0) {
+            targetLock.element.classList.add('broken');
+            locksBroken++;
+            
+            // Jouer le son de cassage de cadena
+            playSound(lockBreakSound);
+            
+            // Gagner des pièces pour chaque cadena cassé
+            const rewardAmount = difficultySettings[currentDifficulty].rewardPerLock;
+            coins += rewardAmount;
+            
+            // Ajouter à l'historique des gains
+            addRecentReward('lock', rewardAmount);
+            
+            // Jouer le son des pièces
+            playSound(coinSound);
+            
+            // Afficher la récompense de pièces
+            showRewardPopup(rewardAmount);
+            showCoinsEarned(targetLock.element, rewardAmount);
+            
+            message.textContent = `Cadena cassé ! +${rewardAmount} pièces ! (${locksBroken}/${maxLocks})`;
+            
+            // Vérifier si tous les cadenas sont cassés
+            if (locksBroken >= maxLocks) {
+              message.textContent = `Tous les cadenas sont cassés ! Maintenant, attaquez le coffre pour gagner la récompense principale !`;
+              break;
+            }
+          }
+        }
+      } else {
+        // Tous les cadenas sont cassés, attaquer le coffre
+        for (let i = 0; i < attackPower; i++) {
+          // Vérifier si le coffre a encore de la vie
+          if (chestHP <= 0) break;
           
-          // Ajouter à l'historique des gains
-          addRecentReward('lock', rewardAmount);
+          // Appliquer des dégâts au coffre
+          chestHP -= 1;
+          damageDealt += 1;
+          totalHits += 1;
           
-          // Jouer le son des pièces
-          playSound(coinSound);
-          
-          // Afficher la récompense de pièces
-          showRewardPopup(rewardAmount);
-          showCoinsEarned(targetLock.element, rewardAmount);
-          
-          message.textContent = `Cadena cassé ! +${rewardAmount} pièces ! (${locksBroken}/${maxLocks})`;
-          
-          // Vérifier si tous les cadenas sont cassés
-          if (locksBroken >= maxLocks) {
+          // Vérifier si le coffre est cassé
+          if (chestHP <= 0) {
             endGame();
             break;
           }
         }
+        
+        // Vérifier l'état du coffre
+        checkChestState();
+        
+        if (chestHP > 0) {
+          message.textContent = `Vous avez infligé ${damageDealt} dégâts au coffre !`;
+        }
       }
-      
-      // Vérifier l'état du coffre
-      checkChestState();
       
       // Mettre à jour l'interface
       updateUI();
       
-      // Message de feedback
-      if (damageDealt > 0 && locksBroken < maxLocks) {
+      // Message de feedback si on attaque les cadenas
+      if (damageDealt > 0 && locksBroken < maxLocks && chestHP > 0) {
         message.textContent = `Vous avez infligé ${damageDealt} dégâts sur un cadena !`;
       }
       
@@ -2085,14 +2114,14 @@
       }, 2000);
     }
     
-    // Fin du jeu - tous les cadenas sont cassés
+    // Fin du jeu - le coffre est cassé
     function endGame() {
       // Gagner le bonus de pièces
       const bonusAmount = difficultySettings[currentDifficulty].bonusReward;
       coins += bonusAmount;
       
       // Ajouter à l'historique des gains
-      addRecentReward('bonus', bonusAmount);
+      addRecentReward('chest', bonusAmount);
       
       updateUI();
       
@@ -2104,7 +2133,7 @@
       popupVictoryMessage.textContent = `+${bonusAmount} pièces bonus !`;
       
       // Afficher le message de victoire
-      message.textContent = `Félicitations ! Vous avez cassé tous les cadenas et gagné ${bonusAmount} pièces bonus !`;
+      message.textContent = `Félicitations ! Vous avez cassé le coffre et gagné ${bonusAmount} pièces bonus !`;
       
       // Afficher la popup de victoire
       setTimeout(() => {
@@ -2131,6 +2160,7 @@
         locksBroken: locksBroken,
         totalHits: totalHits,
         locks: locks.map(lock => ({ id: lock.id, hp: lock.hp })),
+        chestHP: chestHP,
         attackPower: attackPower,
         difficulty: currentDifficulty,
         jackpotAmount: jackpotAmount,
@@ -2160,6 +2190,7 @@
           coins = gameState.coins || coins;
           locksBroken = gameState.locksBroken || locksBroken;
           totalHits = gameState.totalHits || totalHits;
+          chestHP = gameState.chestHP || chestHP;
           attackPower = gameState.attackPower || attackPower;
           currentDifficulty = gameState.difficulty || currentDifficulty;
           jackpotAmount = gameState.jackpotAmount || jackpotAmount;
@@ -2233,6 +2264,7 @@
         locksBroken: locksBroken,
         totalHits: totalHits,
         locks: locks.map(lock => ({ id: lock.id, hp: lock.hp })),
+        chestHP: chestHP,
         attackPower: attackPower,
         difficulty: currentDifficulty,
         jackpotAmount: jackpotAmount,
@@ -2283,6 +2315,7 @@
             coins = gameState.coins || coins;
             locksBroken = gameState.locksBroken || locksBroken;
             totalHits = gameState.totalHits || totalHits;
+            chestHP = gameState.chestHP || chestHP;
             attackPower = gameState.attackPower || attackPower;
             currentDifficulty = gameState.difficulty || currentDifficulty;
             jackpotAmount = gameState.jackpotAmount || jackpotAmount;
