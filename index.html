@@ -1489,7 +1489,7 @@
     
     // Variables pour le pool de drop
     let poolAmount = 0;
-    const poolDropChance = 50000; // 1 chance sur 50 000
+    const poolDropChance = 5000; // 1 chance sur 5000 pour le drop
     const poolMinAmount = 10; // Minimum 10 pièces dans le pool pour pouvoir drop
     const poolMaxAmount = 30000; // Maximum 30000 pièces dans le pool
     
@@ -1930,7 +1930,7 @@
       
       // Vérifier si le pool peut drop (entre 10 et 30000 pièces)
       if (poolAmount >= poolMinAmount && poolAmount <= poolMaxAmount) {
-        // Vérifier si le joueur gagne le drop (1 chance sur 50 000 par coup)
+        // Vérifier si le joueur gagne le drop (1 chance sur 5000 par coup)
         if (Math.random() < attackPower / poolDropChance) {
           const dropAmount = Math.floor(poolAmount);
           coins += dropAmount;
