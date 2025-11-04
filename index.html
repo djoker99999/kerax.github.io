@@ -924,7 +924,7 @@
       100% { transform: rotate(360deg) scale(1); }
     }
 
-    .damage-popup {
+    .impact-popup {
       position: absolute;
       font-size: 24px;
       font-weight: bold;
@@ -932,11 +932,11 @@
       text-shadow: 0 0 10px rgba(255, 0, 0, 0.7);
       pointer-events: none;
       z-index: 100;
-      animation: damageFloat 1.5s ease-out forwards;
+      animation: impactFloat 1.5s ease-out forwards;
       white-space: nowrap;
     }
 
-    @keyframes damageFloat {
+    @keyframes impactFloat {
       0% {
         opacity: 0;
         transform: translateY(0) scale(0.5);
@@ -963,14 +963,14 @@
       }
     }
 
-    .critical-damage {
+    .critical-impact {
       color: #ffaa00;
       font-size: 28px;
       text-shadow: 0 0 15px rgba(255, 170, 0, 0.9);
-      animation: criticalDamage 1.8s ease-out forwards;
+      animation: criticalImpact 1.8s ease-out forwards;
     }
 
-    @keyframes criticalDamage {
+    @keyframes criticalImpact {
       0% {
         opacity: 0;
         transform: translateY(0) scale(0.5) rotate(-10deg);
@@ -997,14 +997,14 @@
       }
     }
 
-    .mega-damage {
+    .mega-impact {
       color: #ff00ff;
       font-size: 32px;
       text-shadow: 0 0 20px rgba(255, 0, 255, 1);
-      animation: megaDamage 2s ease-out forwards;
+      animation: megaImpact 2s ease-out forwards;
     }
 
-    @keyframes megaDamage {
+    @keyframes megaImpact {
       0% {
         opacity: 0;
         transform: translateY(0) scale(0.3);
@@ -1071,7 +1071,7 @@
 
     .combo-popup {
       position: absolute;
-      font-size: 22px;
+      font-size: 28px;
       font-weight: bold;
       color: #ff4444;
       text-shadow: 0 0 10px rgba(255, 0, 0, 0.7);
@@ -1234,15 +1234,15 @@
         padding: 20px;
       }
       
-      .damage-popup {
+      .impact-popup {
         font-size: 18px;
       }
       
-      .critical-damage {
+      .critical-impact {
         font-size: 22px;
       }
       
-      .mega-damage {
+      .mega-impact {
         font-size: 26px;
       }
       
@@ -1281,6 +1281,10 @@
       
       .combo-label {
         font-size: 0.6em;
+      }
+      
+      .combo-popup {
+        font-size: 22px;
       }
     }
   </style>
@@ -1468,10 +1472,10 @@
     <source src="https://files.catbox.moe/4q91kf.wav" type="audio/wav">
   </audio>
   <audio id="attack500Sound" preload="auto">
-    <source src="https://files.catbox.moe/g01f2e.wav" type="audio/wav">
+    <source src="https://files.catbox.moe/0y8tlj.mp3" type="audio/mpeg">
   </audio>
   <audio id="attack1000Sound" preload="auto">
-    <source src="https://files.catbox.moe/g9w4ne.wav" type="audio/wav">
+    <source src="https://files.catbox.moe/98rc6q.wav" type="audio/wav">
   </audio>
   <audio id="jackpotSound" preload="auto">
     <source src="https://assets.mixkit.co/sfx/preview/mixkit-winning-chimes-2015.mp3" type="audio/mpeg">
@@ -1614,8 +1618,8 @@
       const maxChestHP = difficultySettings[currentDifficulty].chestHP;
       const hpPercentage = chestHP / maxChestHP;
       
-      // Si le coffre a moins de 20% de vie
-      if (hpPercentage < 0.2) {
+      // Si le coffre a moins de 20% de vie OU si tous les cadenas sont cassés
+      if (hpPercentage < 0.2 || locksBroken >= maxLocks) {
         magicChest.classList.add('low-hp');
       } else {
         magicChest.classList.remove('low-hp');
@@ -1740,19 +1744,19 @@
       return types[type] || type;
     }
     
-    // Afficher les dégâts en superposition
-    function showDamagePopup(damage, isCritical = false, isMega = false) {
-      const damagePopup = document.createElement('div');
-      damagePopup.className = 'damage-popup';
+    // Afficher les impacts en superposition
+    function showImpactPopup(isCritical = false, isMega = false) {
+      const impactPopup = document.createElement('div');
+      impactPopup.className = 'impact-popup';
       
       if (isMega) {
-        damagePopup.classList.add('mega-damage');
-        damagePopup.textContent = `-${damage} HP !!!`;
+        impactPopup.classList.add('mega-impact');
+        impactPopup.textContent = `IMPACT MÉGA !`;
       } else if (isCritical) {
-        damagePopup.classList.add('critical-damage');
-        damagePopup.textContent = `-${damage} HP !!`;
+        impactPopup.classList.add('critical-impact');
+        impactPopup.textContent = `IMPACT CRITIQUE !`;
       } else {
-        damagePopup.textContent = `-${damage} HP`;
+        impactPopup.textContent = `IMPACT !`;
       }
       
       // Position aléatoire sur le coffre
@@ -1760,14 +1764,14 @@
       const x = Math.random() * (chestRect.width - 100) + 50;
       const y = Math.random() * (chestRect.height - 50) + 25;
       
-      damagePopup.style.left = `${x}px`;
-      damagePopup.style.top = `${y}px`;
+      impactPopup.style.left = `${x}px`;
+      impactPopup.style.top = `${y}px`;
       
-      magicChest.appendChild(damagePopup);
+      magicChest.appendChild(impactPopup);
       
       // Supprimer l'élément après l'animation
       setTimeout(() => {
-        damagePopup.remove();
+        impactPopup.remove();
       }, 2000);
     }
     
@@ -2025,11 +2029,11 @@
       // Gérer le système de pool de drop
       handlePoolDrop();
       
-      // Afficher les dégâts totaux en superposition
+      // Afficher les impacts en superposition
       if (attackPower > 1) {
         const isCritical = attackPower >= 100;
         const isMega = attackPower >= 500;
-        showDamagePopup(attackPower, isCritical, isMega);
+        showImpactPopup(isCritical, isMega);
       }
       
       // Si tous les cadenas ne sont pas encore cassés, attaquer les cadenas
@@ -2080,6 +2084,8 @@
             // Vérifier si tous les cadenas sont cassés
             if (locksBroken >= maxLocks) {
               message.textContent = `Tous les cadenas sont cassés ! Maintenant, attaquez le coffre pour gagner la récompense principale !`;
+              // Mettre le coffre en rouge quand tous les cadenas sont cassés
+              checkChestState();
               break;
             }
           }
