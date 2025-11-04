@@ -206,6 +206,11 @@
       50% { filter: drop-shadow(0 0 30px rgba(255, 0, 0, 1)) brightness(1.5) contrast(1.3) hue-rotate(-40deg); }
     }
 
+    .magic-chest.broken {
+      filter: grayscale(80%) brightness(0.7);
+      pointer-events: none;
+    }
+
     .locks-container {
       position: absolute;
       top: -50px;
@@ -488,6 +493,18 @@
 
     button:active {
       transform: translateY(0);
+    }
+
+    button:disabled {
+      background: linear-gradient(45deg, #555, #777);
+      cursor: not-allowed;
+      transform: none;
+      animation: none;
+    }
+
+    button:disabled:hover {
+      transform: none;
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
     }
 
     #resetBtn {
@@ -1470,10 +1487,11 @@
     let locksBroken = 0;
     let totalHits = 0;
     const maxLocks = 4;
-    let lockHP = 1300; // Base HP pour le niveau facile
-    let chestHP = 1000; // Points de vie du coffre
+    let lockHP = 130; // Base HP pour le niveau facile
+    let chestHP = 5000; // Points de vie du coffre
     let isAttacking = false;
     let currentDifficulty = 'easy';
+    let gameFinished = false; // Nouvelle variable pour suivre l'état du jeu
     
     // Variables pour le son
     let masterVolume = 0.5;
@@ -1766,6 +1784,7 @@
       attackPower = 1;
       locksBroken = 0;
       isAttacking = false;
+      gameFinished = false; // Réinitialiser l'état du jeu
       
       // Réinitialiser les cadenas avec la nouvelle difficulté
       locks.forEach(lock => {
@@ -1786,11 +1805,15 @@
       // Réinitialiser l'état du coffre
       magicChest.classList.remove('low-hp');
       magicChest.classList.remove('shaking');
+      magicChest.classList.remove('broken');
       
       // Réinitialiser le combo
       comboCount = 0;
       comboCounter.classList.remove('active');
       clearTimeout(comboTimeout);
+      
+      // Réactiver le bouton d'attaque
+      attackBtn.disabled = false;
       
       // Mettre à jour l'affichage
       updateUI();
@@ -1971,7 +1994,7 @@
     
     // Attaquer les cadenas ou le coffre
     function attack() {
-      if (isAttacking) return;
+      if (isAttacking || gameFinished) return;
       
       isAttacking = true;
       let damageDealt = 0;
@@ -2116,6 +2139,9 @@
     
     // Fin du jeu - le coffre est cassé
     function endGame() {
+      // Marquer le jeu comme terminé
+      gameFinished = true;
+      
       // Gagner le bonus de pièces
       const bonusAmount = difficultySettings[currentDifficulty].bonusReward;
       coins += bonusAmount;
@@ -2127,6 +2153,12 @@
       
       // Jouer le son de victoire
       playSound(victorySound);
+      
+      // Marquer le coffre comme cassé
+      magicChest.classList.add('broken');
+      
+      // Désactiver le bouton d'attaque
+      attackBtn.disabled = true;
       
       // Mettre à jour la popup de victoire
       popupRewardImage.style.backgroundImage = `url('${difficultySettings[currentDifficulty].image}')`;
@@ -2168,7 +2200,8 @@
         poolAmount: poolAmount,
         recentRewards: recentRewards, // Sauvegarder l'historique des gains
         comboCount: comboCount, // Sauvegarder le combo
-        lastAttackTime: lastAttackTime // Sauvegarder le temps de la dernière attaque
+        lastAttackTime: lastAttackTime, // Sauvegarder le temps de la dernière attaque
+        gameFinished: gameFinished // Sauvegarder l'état du jeu
       };
       
       localStorage.setItem('magicChestGame', JSON.stringify(gameState));
@@ -2201,6 +2234,7 @@
           // Charger les données du combo
           comboCount = gameState.comboCount || 0;
           lastAttackTime = gameState.lastAttackTime || 0;
+          gameFinished = gameState.gameFinished || false; // Charger l'état du jeu
           
           // Mettre à jour la difficulté
           if (gameState.difficulty) {
@@ -2223,6 +2257,15 @@
           
           // Vérifier l'état du coffre
           checkChestState();
+          
+          // Marquer le coffre comme cassé si le jeu était terminé
+          if (gameFinished) {
+            magicChest.classList.add('broken');
+            attackBtn.disabled = true;
+          } else {
+            magicChest.classList.remove('broken');
+            attackBtn.disabled = false;
+          }
           
           // Mettre à jour le mode d'attaque
           document.querySelectorAll('.attack-mode-image').forEach(btn => {
@@ -2273,6 +2316,7 @@
         recentRewards: recentRewards,
         comboCount: comboCount,
         lastAttackTime: lastAttackTime,
+        gameFinished: gameFinished,
         exportDate: new Date().toISOString()
       };
       
@@ -2324,6 +2368,7 @@
             recentRewards = gameState.recentRewards || recentRewards;
             comboCount = gameState.comboCount || 0;
             lastAttackTime = gameState.lastAttackTime || 0;
+            gameFinished = gameState.gameFinished || false;
             
             // Mettre à jour la difficulté
             if (gameState.difficulty) {
@@ -2346,6 +2391,15 @@
             
             // Vérifier l'état du coffre
             checkChestState();
+            
+            // Marquer le coffre comme cassé si le jeu était terminé
+            if (gameFinished) {
+              magicChest.classList.add('broken');
+              attackBtn.disabled = true;
+            } else {
+              magicChest.classList.remove('broken');
+              attackBtn.disabled = false;
+            }
             
             // Mettre à jour le mode d'attaque
             document.querySelectorAll('.attack-mode-image').forEach(btn => {
@@ -2491,7 +2545,7 @@
     
     // Initialiser le jeu au chargement
     window.addEventListener('load', () => {
-      initGame(true); // Charger la sauvegarde au démarrage
+      initGame(false); // NE PAS charger la sauvegarde automatiquement
       playMusic();
     });
   </script>
