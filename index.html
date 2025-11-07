@@ -1339,6 +1339,11 @@
         <div class="difficulty-label">Extrême</div>
         <div class="difficulty-reward">30000 pièces</div>
       </div>
+      <div id="difficultyLegendary" class="difficulty-level">
+        <img src="https://i.ibb.co/pv7VGxQr/unnamed-4-Photoroom.png" alt="Légendaire">
+        <div class="difficulty-label">Légendaire</div>
+        <div class="difficulty-reward">50000 pièces</div>
+      </div>
     </div>
     
     <div class="jackpot-container">
@@ -1610,6 +1615,14 @@
         rewardPerLock: 1000, // 1000 pièces par cadena
         bonusReward: 30000, // 30 000 pièces bonus
         image: 'https://i.ibb.co/N6ZGGZ93/extreme.png'
+      },
+      legendary: {
+        name: 'Légendaire',
+        lockHP: 1500, // 1500 HP par cadena
+        chestHP: 50000, // 50 000 HP pour le coffre
+        rewardPerLock: 400, // 400 pièces par cadena
+        bonusReward: 50000, // 50 000 pièces bonus
+        image: 'https://i.ibb.co/pv7VGxQr/unnamed-4-Photoroom.png'
       }
     };
     
@@ -2483,6 +2496,7 @@
     document.getElementById("difficultyMedium").addEventListener("click", () => setDifficulty('medium'));
     document.getElementById("difficultyHard").addEventListener("click", () => setDifficulty('hard'));
     document.getElementById("difficultyExtreme").addEventListener("click", () => setDifficulty('extreme'));
+    document.getElementById("difficultyLegendary").addEventListener("click", () => setDifficulty('legendary'));
 
     // Événements pour les modes d'attaque
     document.getElementById("mode1").addEventListener("click", () => setAttackMode(1));
@@ -2541,6 +2555,8 @@
         setDifficulty('hard');
       } else if (e.key === 'x' || e.key === 'X') {
         setDifficulty('extreme');
+      } else if (e.key === 'l' || e.key === 'L') {
+        setDifficulty('legendary');
       } else if (e.key === 'a' || e.key === 'A') {
         toggleSound();
       } else if (e.key === 'Escape') {
