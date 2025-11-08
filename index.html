@@ -1121,6 +1121,11 @@
       user-select: none;
       z-index: 50;
       transition: transform 0.2s ease;
+      background: rgba(10, 15, 30, 0.8);
+      border-radius: 12px;
+      border: 2px solid rgba(184, 134, 11, 0.5);
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
+      min-width: 200px;
     }
 
     .draggable-container:hover {
@@ -1143,10 +1148,131 @@
       cursor: move;
       font-size: 12px;
       color: rgba(255, 255, 255, 0.7);
+      font-weight: bold;
     }
 
     .draggable-content {
       padding: 10px;
+    }
+
+    /* Styles pour le tableau des gagnants */
+    .winners-container {
+      max-height: 300px;
+      overflow-y: auto;
+      margin: 10px 0;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 8px;
+      padding: 8px;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+
+    .winners-title {
+      font-size: 1em;
+      color: #ffd700;
+      margin-bottom: 8px;
+      text-shadow: 0 0 5px rgba(255, 215, 0, 0.5);
+    }
+
+    .winners-list {
+      text-align: left;
+      font-size: 0.8em;
+    }
+
+    .winner-item {
+      padding: 6px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .winner-item:last-child {
+      border-bottom: none;
+    }
+
+    .winner-name {
+      color: #ffffff;
+      font-weight: bold;
+    }
+
+    .winner-amount {
+      color: #ffd700;
+      font-weight: bold;
+    }
+
+    .add-winner-form {
+      display: flex;
+      gap: 5px;
+      margin-top: 10px;
+    }
+
+    .add-winner-form input {
+      flex: 1;
+      padding: 5px;
+      border-radius: 5px;
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      background: rgba(255, 255, 255, 0.1);
+      color: white;
+    }
+
+    .add-winner-form button {
+      padding: 5px 10px;
+      font-size: 12px;
+      border-radius: 5px;
+    }
+
+    /* Styles pour l'historique des petits gains */
+    .small-rewards-container {
+      max-height: 200px;
+      overflow-y: auto;
+      margin: 10px 0;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 8px;
+      padding: 8px;
+      border: 1px solid rgba(255, 215, 0, 0.3);
+    }
+
+    .small-rewards-title {
+      font-size: 1em;
+      color: #ffd700;
+      margin-bottom: 8px;
+      text-shadow: 0 0 5px rgba(255, 215, 0, 0.5);
+    }
+
+    .small-rewards-list {
+      text-align: left;
+      font-size: 0.8em;
+    }
+
+    .small-reward-item {
+      padding: 6px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .small-reward-item:last-child {
+      border-bottom: none;
+    }
+
+    .small-reward-amount {
+      color: #ffd700;
+      font-weight: bold;
+    }
+
+    .small-reward-time {
+      font-size: 0.7em;
+      color: #daa520;
+    }
+
+    /* Styles pour le bouton Force Jackpot */
+    #forceJackpotBtn {
+      background: linear-gradient(45deg, #ff6b6b, #ff8e8e);
+    }
+
+    #forceJackpotBtn:hover {
+      background: linear-gradient(45deg, #ff8e8e, #ffaaaa);
     }
 
     @media (min-width: 768px) {
@@ -1327,6 +1453,10 @@
       .combo-popup {
         font-size: 22px;
       }
+      
+      .draggable-container {
+        min-width: 180px;
+      }
     }
   </style>
 </head>
@@ -1403,6 +1533,41 @@
       </div>
     </div>
     
+    <!-- Conteneur des gagnants déplaçable -->
+    <div class="draggable-container" id="winnersDraggable" style="top: 400px; left: 50px;">
+      <div class="draggable-handle">🏆 GAGNANTS</div>
+      <div class="draggable-content">
+        <div class="winners-container">
+          <div class="winners-title">Liste des gagnants</div>
+          <div class="winners-list" id="winnersList">
+            <div class="winner-item">
+              <span>Aucun gagnant encore</span>
+            </div>
+          </div>
+          <div class="add-winner-form">
+            <input type="text" id="winnerNameInput" placeholder="Nom du gagnant">
+            <input type="number" id="winnerAmountInput" placeholder="Montant">
+            <button id="addWinnerBtn">Ajouter</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Conteneur des petits gains déplaçable -->
+    <div class="draggable-container" id="smallRewardsDraggable" style="top: 400px; right: 50px;">
+      <div class="draggable-handle">📈 PETITS GAINS</div>
+      <div class="draggable-content">
+        <div class="small-rewards-container">
+          <div class="small-rewards-title">Gains inférieurs à 2000 pièces</div>
+          <div class="small-rewards-list" id="smallRewardsList">
+            <div class="small-reward-item">
+              <span>Aucun petit gain encore</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    
     <div class="stats">
       <div class="stat">
         <div class="stat-value" id="coinsCount">0</div>
@@ -1471,6 +1636,7 @@
 
     <div class="controls">
       <button id="attackBtn">🔨 Attaquer</button>
+      <button id="forceJackpotBtn">🎰 Force Jackpot</button>
       <button id="saveBtn">💾 Sauvegarder</button>
       <button id="importBtn">📁 Importer</button>
       <button id="exportBtn">💾 Exporter</button>
@@ -1577,6 +1743,13 @@
     const comboDuration = 3000; // 3 secondes pour maintenir le combo
     let lastAttackTime = 0;
     
+    // Liste des gagnants
+    let winners = [];
+    
+    // Historique des petits gains
+    let smallRewards = [];
+    const smallRewardThreshold = 2000; // Seuil pour les petits gains
+    
     // État des cadenas
     const locks = [
       { id: 'lock1', hp: lockHP, element: null },
@@ -1591,6 +1764,7 @@
     const totalHitsCount = document.getElementById('totalHits');
     const message = document.getElementById('message');
     const attackBtn = document.getElementById('attackBtn');
+    const forceJackpotBtn = document.getElementById('forceJackpotBtn');
     const resetBtn = document.getElementById('resetBtn');
     const saveBtn = document.getElementById('saveBtn');
     const importBtn = document.getElementById('importBtn');
@@ -1605,6 +1779,11 @@
     const jackpotAmountDisplay = document.getElementById('jackpotAmount');
     const poolAmountDisplay = document.getElementById('poolAmount');
     const recentRewardsList = document.getElementById('recentRewardsList');
+    const winnersList = document.getElementById('winnersList');
+    const smallRewardsList = document.getElementById('smallRewardsList');
+    const winnerNameInput = document.getElementById('winnerNameInput');
+    const winnerAmountInput = document.getElementById('winnerAmountInput');
+    const addWinnerBtn = document.getElementById('addWinnerBtn');
     
     // Éléments pour le système de combo
     const comboCounter = document.getElementById('comboCounter');
@@ -1613,6 +1792,8 @@
     // Éléments pour les conteneurs déplaçables
     const jackpotDraggable = document.getElementById('jackpotDraggable');
     const poolDraggable = document.getElementById('poolDraggable');
+    const winnersDraggable = document.getElementById('winnersDraggable');
+    const smallRewardsDraggable = document.getElementById('smallRewardsDraggable');
     
     // Éléments audio
     const hammerSound = document.getElementById('hammerSound');
@@ -1808,6 +1989,18 @@
         recentRewards = recentRewards.slice(0, maxRecentRewards);
       }
       
+      // Ajouter aux petits gains si le montant est inférieur au seuil
+      if (amount < smallRewardThreshold) {
+        smallRewards.unshift(reward);
+        
+        // Garder seulement les derniers petits gains
+        if (smallRewards.length > maxRecentRewards) {
+          smallRewards = smallRewards.slice(0, maxRecentRewards);
+        }
+        
+        updateSmallRewardsDisplay();
+      }
+      
       updateRecentRewardsDisplay();
     }
     
@@ -1831,6 +2024,76 @@
           <div class="reward-time">${reward.time}</div>
         </div>
       `).join('');
+    }
+    
+    // Mettre à jour l'affichage des petits gains
+    function updateSmallRewardsDisplay() {
+      if (smallRewards.length === 0) {
+        smallRewardsList.innerHTML = `
+          <div class="small-reward-item">
+            <span>Aucun petit gain encore</span>
+          </div>
+        `;
+        return;
+      }
+      
+      smallRewardsList.innerHTML = smallRewards.map(reward => `
+        <div class="small-reward-item">
+          <div>
+            <strong>${getRewardTypeText(reward.type)}</strong>
+          </div>
+          <div class="small-reward-amount">+${reward.amount} pièces</div>
+          <div class="small-reward-time">${reward.time}</div>
+        </div>
+      `).join('');
+    }
+    
+    // Mettre à jour l'affichage des gagnants
+    function updateWinnersDisplay() {
+      if (winners.length === 0) {
+        winnersList.innerHTML = `
+          <div class="winner-item">
+            <span>Aucun gagnant encore</span>
+          </div>
+        `;
+        return;
+      }
+      
+      winnersList.innerHTML = winners.map(winner => `
+        <div class="winner-item">
+          <div class="winner-name">${winner.name}</div>
+          <div class="winner-amount">${winner.amount} pièces</div>
+        </div>
+      `).join('');
+    }
+    
+    // Ajouter un gagnant
+    function addWinner(name, amount) {
+      if (!name || !amount || amount <= 0) {
+        message.textContent = "Veuillez entrer un nom et un montant valide !";
+        return;
+      }
+      
+      const winner = {
+        name: name,
+        amount: amount,
+        date: new Date().toLocaleDateString('fr-FR')
+      };
+      
+      winners.unshift(winner); // Ajouter au début
+      
+      // Garder seulement les derniers gagnants
+      if (winners.length > 10) {
+        winners = winners.slice(0, 10);
+      }
+      
+      updateWinnersDisplay();
+      
+      // Réinitialiser les champs
+      winnerNameInput.value = '';
+      winnerAmountInput.value = '';
+      
+      message.textContent = `Gagnant ajouté : ${name} - ${amount} pièces !`;
     }
     
     // Obtenir le texte du type de récompense
@@ -2049,6 +2312,21 @@
         jackpotAmount = 1000; // Remettre le jackpot à 1000 pièces
         updateUI();
       }
+    }
+    
+    // Forcer le jackpot (fonctionnalité spéciale)
+    function forceJackpot() {
+      coins += jackpotAmount;
+      
+      // Ajouter à l'historique des gains
+      addRecentReward('jackpot', jackpotAmount);
+      
+      showJackpotPopup();
+      message.textContent = `JACKPOT FORCÉ ! Vous avez gagné ${jackpotAmount} pièces !`;
+      
+      // Réinitialiser le jackpot
+      jackpotAmount = 1000;
+      updateUI();
     }
     
     // Gérer le système de pool de drop
@@ -2309,6 +2587,8 @@
         comboCount: comboCount, // Sauvegarder le combo
         lastAttackTime: lastAttackTime, // Sauvegarder le temps de la dernière attaque
         gameFinished: gameFinished, // Sauvegarder l'état du jeu
+        winners: winners, // Sauvegarder la liste des gagnants
+        smallRewards: smallRewards, // Sauvegarder l'historique des petits gains
         jackpotPosition: {
           top: jackpotDraggable.style.top,
           left: jackpotDraggable.style.left
@@ -2316,6 +2596,14 @@
         poolPosition: {
           top: poolDraggable.style.top,
           left: poolDraggable.style.left
+        },
+        winnersPosition: {
+          top: winnersDraggable.style.top,
+          left: winnersDraggable.style.left
+        },
+        smallRewardsPosition: {
+          top: smallRewardsDraggable.style.top,
+          left: smallRewardsDraggable.style.left
         }
       };
       
@@ -2345,6 +2633,8 @@
           hitsSinceLastJackpot = gameState.hitsSinceLastJackpot || hitsSinceLastJackpot;
           poolAmount = gameState.poolAmount || poolAmount;
           recentRewards = gameState.recentRewards || recentRewards; // Charger l'historique
+          winners = gameState.winners || winners; // Charger la liste des gagnants
+          smallRewards = gameState.smallRewards || smallRewards; // Charger l'historique des petits gains
           
           // Charger les données du combo
           comboCount = gameState.comboCount || 0;
@@ -2360,6 +2650,16 @@
           if (gameState.poolPosition) {
             poolDraggable.style.top = gameState.poolPosition.top;
             poolDraggable.style.left = gameState.poolPosition.left;
+          }
+          
+          if (gameState.winnersPosition) {
+            winnersDraggable.style.top = gameState.winnersPosition.top;
+            winnersDraggable.style.left = gameState.winnersPosition.left;
+          }
+          
+          if (gameState.smallRewardsPosition) {
+            smallRewardsDraggable.style.top = gameState.smallRewardsPosition.top;
+            smallRewardsDraggable.style.left = gameState.smallRewardsPosition.left;
           }
           
           // Mettre à jour la difficulté
@@ -2417,6 +2717,12 @@
           // Mettre à jour l'affichage des gains récents
           updateRecentRewardsDisplay();
           
+          // Mettre à jour l'affichage des gagnants
+          updateWinnersDisplay();
+          
+          // Mettre à jour l'affichage des petits gains
+          updateSmallRewardsDisplay();
+          
           updateUI();
           
           message.textContent = "Partie chargée !";
@@ -2440,6 +2746,8 @@
         hitsSinceLastJackpot: hitsSinceLastJackpot,
         poolAmount: poolAmount,
         recentRewards: recentRewards,
+        winners: winners,
+        smallRewards: smallRewards,
         comboCount: comboCount,
         lastAttackTime: lastAttackTime,
         gameFinished: gameFinished,
@@ -2450,6 +2758,14 @@
         poolPosition: {
           top: poolDraggable.style.top,
           left: poolDraggable.style.left
+        },
+        winnersPosition: {
+          top: winnersDraggable.style.top,
+          left: winnersDraggable.style.left
+        },
+        smallRewardsPosition: {
+          top: smallRewardsDraggable.style.top,
+          left: smallRewardsDraggable.style.left
         },
         exportDate: new Date().toISOString()
       };
@@ -2500,6 +2816,8 @@
             hitsSinceLastJackpot = gameState.hitsSinceLastJackpot || hitsSinceLastJackpot;
             poolAmount = gameState.poolAmount || poolAmount;
             recentRewards = gameState.recentRewards || recentRewards;
+            winners = gameState.winners || winners;
+            smallRewards = gameState.smallRewards || smallRewards;
             comboCount = gameState.comboCount || 0;
             lastAttackTime = gameState.lastAttackTime || 0;
             gameFinished = gameState.gameFinished || false;
@@ -2513,6 +2831,16 @@
             if (gameState.poolPosition) {
               poolDraggable.style.top = gameState.poolPosition.top;
               poolDraggable.style.left = gameState.poolPosition.left;
+            }
+            
+            if (gameState.winnersPosition) {
+              winnersDraggable.style.top = gameState.winnersPosition.top;
+              winnersDraggable.style.left = gameState.winnersPosition.left;
+            }
+            
+            if (gameState.smallRewardsPosition) {
+              smallRewardsDraggable.style.top = gameState.smallRewardsPosition.top;
+              smallRewardsDraggable.style.left = gameState.smallRewardsPosition.left;
             }
             
             // Mettre à jour la difficulté
@@ -2570,6 +2898,12 @@
             // Mettre à jour l'affichage des gains récents
             updateRecentRewardsDisplay();
             
+            // Mettre à jour l'affichage des gagnants
+            updateWinnersDisplay();
+            
+            // Mettre à jour l'affichage des petits gains
+            updateSmallRewardsDisplay();
+            
             updateUI();
             
             message.textContent = "Sauvegarde importée avec succès !";
@@ -2609,12 +2943,16 @@
     
     // Événements
     attackBtn.addEventListener('click', attack);
+    forceJackpotBtn.addEventListener('click', forceJackpot);
     resetBtn.addEventListener('click', () => initGame(false));
     saveBtn.addEventListener('click', saveGame);
     importBtn.addEventListener('click', importSave);
     exportBtn.addEventListener('click', exportSave);
     closePopupBtn.addEventListener('click', () => {
       victoryPopup.classList.remove('active');
+    });
+    addWinnerBtn.addEventListener('click', () => {
+      addWinner(winnerNameInput.value, parseInt(winnerAmountInput.value));
     });
 
     // Événements pour les niveaux de difficulté
@@ -2661,6 +2999,8 @@
         importSave();
       } else if (e.key === 'e' || e.key === 'E') {
         exportSave();
+      } else if (e.key === 'j' || e.key === 'J') {
+        forceJackpot();
       } else if (e.key === '1') {
         setAttackMode(1);
       } else if (e.key === '2') {
@@ -2696,6 +3036,8 @@
       // Rendre les conteneurs déplaçables
       makeDraggable(jackpotDraggable);
       makeDraggable(poolDraggable);
+      makeDraggable(winnersDraggable);
+      makeDraggable(smallRewardsDraggable);
       
       initGame(false); // NE PAS charger la sauvegarde automatiquement
       playMusic();
