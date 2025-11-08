@@ -770,6 +770,9 @@
       background: rgba(255, 215, 0, 0.1);
       border-radius: 12px;
       border: 2px solid rgba(255, 215, 0, 0.3);
+      position: relative;
+      cursor: move;
+      user-select: none;
     }
 
     .jackpot-title {
@@ -798,6 +801,9 @@
       background: rgba(0, 150, 255, 0.1);
       border-radius: 12px;
       border: 2px solid rgba(0, 150, 255, 0.3);
+      position: relative;
+      cursor: move;
+      user-select: none;
     }
 
     .pool-title {
@@ -1108,6 +1114,41 @@
       }
     }
 
+    /* Styles pour les carrés déplaçables */
+    .draggable-container {
+      position: absolute;
+      cursor: move;
+      user-select: none;
+      z-index: 50;
+      transition: transform 0.2s ease;
+    }
+
+    .draggable-container:hover {
+      transform: scale(1.05);
+    }
+
+    .draggable-container:active {
+      transform: scale(1.1);
+      z-index: 60;
+    }
+
+    .draggable-handle {
+      width: 100%;
+      height: 20px;
+      background: rgba(255, 255, 255, 0.2);
+      border-radius: 10px 10px 0 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: move;
+      font-size: 12px;
+      color: rgba(255, 255, 255, 0.7);
+    }
+
+    .draggable-content {
+      padding: 10px;
+    }
+
     @media (min-width: 768px) {
       .game-container {
         padding: 25px;
@@ -1346,14 +1387,20 @@
       </div>
     </div>
     
-    <div class="jackpot-container">
-      <div class="jackpot-title">JACKPOT</div>
-      <div class="jackpot-amount" id="jackpotAmount">1000 pièces</div>
+    <!-- Conteneur de jackpot déplaçable -->
+    <div class="draggable-container" id="jackpotDraggable" style="top: 200px; left: 50px;">
+      <div class="draggable-handle">💰 JACKPOT</div>
+      <div class="jackpot-container">
+        <div class="jackpot-amount" id="jackpotAmount">1000 pièces</div>
+      </div>
     </div>
     
-    <div class="pool-container">
-      <div class="pool-title">POOL DE DROP</div>
-      <div class="pool-amount" id="poolAmount">0 pièces</div>
+    <!-- Conteneur de pool de drop déplaçable -->
+    <div class="draggable-container" id="poolDraggable" style="top: 300px; right: 50px;">
+      <div class="draggable-handle">💧 POOL DE DROP</div>
+      <div class="pool-container">
+        <div class="pool-amount" id="poolAmount">0 pièces</div>
+      </div>
     </div>
     
     <div class="stats">
@@ -1563,6 +1610,10 @@
     const comboCounter = document.getElementById('comboCounter');
     const comboCountDisplay = document.getElementById('comboCount');
     
+    // Éléments pour les conteneurs déplaçables
+    const jackpotDraggable = document.getElementById('jackpotDraggable');
+    const poolDraggable = document.getElementById('poolDraggable');
+    
     // Éléments audio
     const hammerSound = document.getElementById('hammerSound');
     const lockBreakSound = document.getElementById('lockBreakSound');
@@ -1625,6 +1676,43 @@
         image: 'https://i.ibb.co/pv7VGxQr/unnamed-4-Photoroom.png'
       }
     };
+    
+    // Fonctionnalité de glisser-déposer pour les conteneurs
+    function makeDraggable(element) {
+      let pos1 = 0, pos2 = 0, pos3 = 0, pos4 = 0;
+      
+      element.onmousedown = dragMouseDown;
+      
+      function dragMouseDown(e) {
+        e = e || window.event;
+        e.preventDefault();
+        // Obtenir la position de la souris au début
+        pos3 = e.clientX;
+        pos4 = e.clientY;
+        document.onmouseup = closeDragElement;
+        // Appeler une fonction chaque fois que le curseur se déplace
+        document.onmousemove = elementDrag;
+      }
+      
+      function elementDrag(e) {
+        e = e || window.event;
+        e.preventDefault();
+        // Calculer la nouvelle position du curseur
+        pos1 = pos3 - e.clientX;
+        pos2 = pos4 - e.clientY;
+        pos3 = e.clientX;
+        pos4 = e.clientY;
+        // Définir la nouvelle position de l'élément
+        element.style.top = (element.offsetTop - pos2) + "px";
+        element.style.left = (element.offsetLeft - pos1) + "px";
+      }
+      
+      function closeDragElement() {
+        // Arrêter de déplacer lorsque le bouton de la souris est relâché
+        document.onmouseup = null;
+        document.onmousemove = null;
+      }
+    }
     
     // Vérifier si le coffre doit devenir rouge
     function checkChestState() {
@@ -2220,7 +2308,15 @@
         recentRewards: recentRewards, // Sauvegarder l'historique des gains
         comboCount: comboCount, // Sauvegarder le combo
         lastAttackTime: lastAttackTime, // Sauvegarder le temps de la dernière attaque
-        gameFinished: gameFinished // Sauvegarder l'état du jeu
+        gameFinished: gameFinished, // Sauvegarder l'état du jeu
+        jackpotPosition: {
+          top: jackpotDraggable.style.top,
+          left: jackpotDraggable.style.left
+        },
+        poolPosition: {
+          top: poolDraggable.style.top,
+          left: poolDraggable.style.left
+        }
       };
       
       localStorage.setItem('magicChestGame', JSON.stringify(gameState));
@@ -2254,6 +2350,17 @@
           comboCount = gameState.comboCount || 0;
           lastAttackTime = gameState.lastAttackTime || 0;
           gameFinished = gameState.gameFinished || false; // Charger l'état du jeu
+          
+          // Charger les positions des conteneurs déplaçables
+          if (gameState.jackpotPosition) {
+            jackpotDraggable.style.top = gameState.jackpotPosition.top;
+            jackpotDraggable.style.left = gameState.jackpotPosition.left;
+          }
+          
+          if (gameState.poolPosition) {
+            poolDraggable.style.top = gameState.poolPosition.top;
+            poolDraggable.style.left = gameState.poolPosition.left;
+          }
           
           // Mettre à jour la difficulté
           if (gameState.difficulty) {
@@ -2336,6 +2443,14 @@
         comboCount: comboCount,
         lastAttackTime: lastAttackTime,
         gameFinished: gameFinished,
+        jackpotPosition: {
+          top: jackpotDraggable.style.top,
+          left: jackpotDraggable.style.left
+        },
+        poolPosition: {
+          top: poolDraggable.style.top,
+          left: poolDraggable.style.left
+        },
         exportDate: new Date().toISOString()
       };
       
@@ -2388,6 +2503,17 @@
             comboCount = gameState.comboCount || 0;
             lastAttackTime = gameState.lastAttackTime || 0;
             gameFinished = gameState.gameFinished || false;
+            
+            // Charger les positions des conteneurs déplaçables
+            if (gameState.jackpotPosition) {
+              jackpotDraggable.style.top = gameState.jackpotPosition.top;
+              jackpotDraggable.style.left = gameState.jackpotPosition.left;
+            }
+            
+            if (gameState.poolPosition) {
+              poolDraggable.style.top = gameState.poolPosition.top;
+              poolDraggable.style.left = gameState.poolPosition.left;
+            }
             
             // Mettre à jour la difficulté
             if (gameState.difficulty) {
@@ -2567,6 +2693,10 @@
     
     // Initialiser le jeu au chargement
     window.addEventListener('load', () => {
+      // Rendre les conteneurs déplaçables
+      makeDraggable(jackpotDraggable);
+      makeDraggable(poolDraggable);
+      
       initGame(false); // NE PAS charger la sauvegarde automatiquement
       playMusic();
     });
