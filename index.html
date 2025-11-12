@@ -771,7 +771,7 @@
       border-radius: 12px;
       border: 2px solid rgba(255, 215, 0, 0.3);
       position: relative;
-      cursor: move;
+      /* cursor: move; */ /* Retiré pour ne pas perturber le handle */
       user-select: none;
     }
 
@@ -802,7 +802,7 @@
       border-radius: 12px;
       border: 2px solid rgba(0, 150, 255, 0.3);
       position: relative;
-      cursor: move;
+      /* cursor: move; */
       user-select: none;
     }
 
@@ -1117,7 +1117,7 @@
     /* Styles pour les carrés déplaçables */
     .draggable-container {
       position: absolute;
-      cursor: move;
+      /* cursor: move; */ /* Retiré pour ne pas perturber le handle */
       user-select: none;
       z-index: 50;
       transition: transform 0.2s ease;
@@ -1133,7 +1133,7 @@
     }
 
     .draggable-container:active {
-      transform: scale(1.1);
+      /* L'activation se fait via JS pour le drag */
       z-index: 60;
     }
 
@@ -1219,6 +1219,7 @@
       padding: 5px 10px;
       font-size: 12px;
       border-radius: 5px;
+      /* Hérite des styles 'button' de base pour le look */
     }
 
     /* Styles pour l'historique des petits gains */
@@ -1278,7 +1279,7 @@
     /* Styles pour le bouton Bonus déplaçable */
     .bonus-button-container {
       position: absolute;
-      cursor: move;
+      /* cursor: move; */
       user-select: none;
       z-index: 50;
       transition: transform 0.2s ease;
@@ -1294,7 +1295,6 @@
     }
 
     .bonus-button-container:active {
-      transform: scale(1.1);
       z-index: 60;
     }
 
@@ -1505,7 +1505,6 @@
   </style>
 </head>
 <body>
-  <!-- Compteur de combo -->
   <div class="combo-counter" id="comboCounter">
     <div class="combo-count" id="comboCount">0</div>
     <div class="combo-label">COMBO</div>
@@ -1561,7 +1560,6 @@
       </div>
     </div>
     
-    <!-- Conteneur de jackpot déplaçable -->
     <div class="draggable-container" id="jackpotDraggable" style="top: 200px; left: 50px;">
       <div class="draggable-handle">💰 JACKPOT</div>
       <div class="jackpot-container">
@@ -1569,7 +1567,6 @@
       </div>
     </div>
     
-    <!-- Conteneur de pool de drop déplaçable -->
     <div class="draggable-container" id="poolDraggable" style="top: 300px; right: 50px;">
       <div class="draggable-handle">💧 POOL DE DROP</div>
       <div class="pool-container">
@@ -1577,7 +1574,6 @@
       </div>
     </div>
     
-    <!-- Conteneur des gagnants déplaçable -->
     <div class="draggable-container" id="winnersDraggable" style="top: 400px; left: 50px;">
       <div class="draggable-handle">🏆 GAGNANTS</div>
       <div class="draggable-content">
@@ -1597,7 +1593,6 @@
       </div>
     </div>
     
-    <!-- Conteneur des petits gains déplaçable -->
     <div class="draggable-container" id="smallRewardsDraggable" style="top: 400px; right: 50px;">
       <div class="draggable-handle">📈 PETITS GAINS</div>
       <div class="draggable-content">
@@ -1612,7 +1607,6 @@
       </div>
     </div>
     
-    <!-- Conteneur du bouton Force Jackpot déplaçable -->
     <div class="bonus-button-container" id="bonusButtonDraggable" style="top: 500px; left: 50px;">
       <div class="bonus-button-handle">🎰 BONUS</div>
       <div class="bonus-button-content">
@@ -1696,11 +1690,9 @@
 
     <p id="message">Choisis un niveau de difficulté et clique sur "Attaquer" !</p>
     
-    <!-- Panneau des derniers gains -->
     <div class="recent-rewards-container">
       <div class="recent-rewards-title">🎯 Derniers Gains Obtenus</div>
       <div class="recent-rewards-list" id="recentRewardsList">
-        <!-- Les gains récents seront ajoutés ici dynamiquement -->
         <div class="recent-reward-item">
           <span>Aucun gain encore</span>
         </div>
@@ -1720,7 +1712,6 @@
     </div>
   </div>
 
-  <!-- Sons intégrés -->
   <audio id="hammerSound" preload="auto">
     <source src="https://files.catbox.moe/fp8aq6.mp3" type="audio/mpeg">
   </audio>
@@ -1736,7 +1727,6 @@
   <audio id="backgroundMusic" loop preload="auto">
     <source src="https://assets.mixkit.co/music/preview/mixkit-game-show-suspense-waiting-667.mp3" type="audio/mpeg">
   </audio>
-  <!-- Nouveaux sons pour les attaques spéciales -->
   <audio id="attack100Sound" preload="auto">
     <source src="https://files.catbox.moe/4q91kf.wav" type="audio/wav">
   </audio>
@@ -1910,15 +1900,33 @@
       }
     };
     
+    // *** CORRECTION DE LA FONCTION DRAGGABLE ***
     // Fonctionnalité de glisser-déposer pour les conteneurs
     function makeDraggable(element) {
       let pos1 = 0, pos2 = 0, pos3 = 0, pos4 = 0;
       
-      element.onmousedown = dragMouseDown;
+      // Trouver le "handle" (la poignée) pour le glisser-déposer
+      // On cherche une poignée avec la classe .draggable-handle OU .bonus-button-handle
+      const handle = element.querySelector('.draggable-handle, .bonus-button-handle');
+      
+      if (handle) {
+        // Attacher l'événement mousedown SEULEMENT au handle
+        handle.onmousedown = dragMouseDown;
+      } else {
+        // Fallback: si aucun handle n'est trouvé, on ne fait rien
+        // pour éviter d'attacher le listener à tout l'élément, ce qui causait le bug.
+        console.warn("Handle de glisser-déposer non trouvé pour", element.id);
+      }
       
       function dragMouseDown(e) {
         e = e || window.event;
-        e.preventDefault();
+        // preventDefault() ici est correct, il empêche la sélection de texte
+        // PENDANT le glissement, mais n'affecte pas les autres éléments.
+        e.preventDefault(); 
+        
+        // Mettre l'élément au-dessus des autres pendant le drag
+        element.style.zIndex = "60";
+        
         // Obtenir la position de la souris au début
         pos3 = e.clientX;
         pos4 = e.clientY;
@@ -1935,12 +1943,14 @@
         pos2 = pos4 - e.clientY;
         pos3 = e.clientX;
         pos4 = e.clientY;
-        // Définir la nouvelle position de l'élément
+        // Définir la nouvelle position de l'élément (l'élément parent, pas le handle)
         element.style.top = (element.offsetTop - pos2) + "px";
         element.style.left = (element.offsetLeft - pos1) + "px";
       }
       
       function closeDragElement() {
+        // Rétablir le z-index
+        element.style.zIndex = "50";
         // Arrêter de déplacer lorsque le bouton de la souris est relâché
         document.onmouseup = null;
         document.onmousemove = null;
@@ -3058,6 +3068,11 @@
     
     // Raccourcis clavier
     document.addEventListener('keydown', (e) => {
+      // Ignorer les raccourcis si on est en train de taper dans un champ de texte
+      if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') {
+        return;
+      }
+      
       if (e.key === ' ' || e.key === 'Enter') {
         e.preventDefault();
         attack();
